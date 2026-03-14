@@ -60,6 +60,111 @@ Place raw data files in: 06_data_extraction/raw_data/
 When collection is complete: "I've placed the data in the raw_data folder — please continue"
 ```
 
+## Step 2b: Exploratory Data Analysis (EDA)
+
+Before running pre-specified analyses, the Statistician must explore the data to understand its structure, distributions, and relationship to the research question. This step informs whether the pre-specified analysis plan is appropriate or needs protocol-justified adjustments.
+
+**Statistician agent prompt:**
+
+```
+[Insert Statistician system prompt from agent-roles.md]
+
+TASK: Perform exploratory data analysis on the cleaned dataset. Your goal is to understand
+the data's structure, identify potential issues, and assess whether the pre-specified
+analysis plan is appropriate for the data as collected.
+
+STUDY PROTOCOL:
+[Read and insert 03_inclusion_exclusion/study_protocol.md]
+
+RESEARCH QUESTION:
+[Read and insert 02_research_question/research_question.md]
+
+DATA:
+[Read and insert 06_data_extraction/cleaned_data.csv]
+
+Produce the following:
+
+1. **Dataset overview**
+   - N participants, N variables
+   - Variable types (continuous, categorical, date, binary)
+   - Completeness: % non-missing per variable; overall data completeness rate
+
+2. **Distribution assessment for all continuous variables**
+   - Central tendency (mean, median) and spread (SD, IQR, range)
+   - Skewness assessment: if |skewness| > 1 or visual inspection suggests non-normality,
+     flag the variable and note implications for planned tests
+   - Outlier detection: values beyond mean ± 3SD or IQR × 1.5 fences; count and list
+   - For the PRIMARY OUTCOME specifically: describe its distribution in detail
+
+3. **Categorical variable frequencies**
+   - n and % per level for every categorical variable
+   - Flag any level with <5 observations (may cause estimation problems)
+   - Flag any near-constant variables (one level >95%)
+
+4. **Bivariate relationships to the primary outcome**
+   - For each key predictor (exposure, confounders): show its relationship to the outcome
+   - Continuous predictors: correlation coefficient (Pearson if normal, Spearman if skewed)
+   - Categorical predictors: group means/medians of the outcome by level
+   - Flag any predictor with unexpectedly no association (r < 0.05) — may indicate coding
+     error or that the variable lacks variability in this sample
+
+5. **Collinearity check**
+   - For all continuous predictors in the planned adjusted model: pairwise correlations
+   - Flag any pair with |r| > 0.7 — potential multicollinearity in regression
+
+6. **Analysis plan assessment**
+   - Based on the EDA findings, assess whether the pre-specified statistical methods
+     in study_protocol.md are appropriate for this dataset:
+     - Is the planned test appropriate for the outcome distribution? (e.g., t-test
+       assumes normality — if heavily skewed, note that Wilcoxon or log-transform
+       may be needed)
+     - Is the sample size sufficient for the planned model complexity? (rule of thumb:
+       ≥10 events per predictor for logistic regression, ≥20 per predictor for linear)
+     - Are any planned subgroup analyses underpowered given the subgroup sizes observed?
+   - Classify each concern as:
+     - PROCEED AS PLANNED — data supports the pre-specified method
+     - MINOR ADJUSTMENT — slight modification needed (e.g., use median instead of mean)
+     - PROTOCOL DEVIATION — a pre-specified analysis is inappropriate for the data;
+       recommend an alternative with justification; flag for PI review
+
+7. **Executable EDA script**
+   - Write a Python (preferred) or R script that:
+     - Reads from 06_data_extraction/cleaned_data.csv
+     - Produces all EDA outputs above
+     - Generates diagnostic plots: histograms for continuous variables, bar charts for
+       categorical, scatter/box plots for key bivariate relationships
+     - Saves all figures as PNG to 06_data_extraction/analysis_scripts/outputs/eda/
+     - Prints summary statistics and any flagged issues to stdout
+   - Save script to 06_data_extraction/analysis_scripts/eda.py (or .R)
+
+OUTPUT: (1) EDA report written to 06_data_extraction/eda_report.md,
+(2) EDA script written to disk.
+```
+
+Write EDA report to `06_data_extraction/eda_report.md`.
+Write EDA script to `06_data_extraction/analysis_scripts/eda.py` (or `.R`).
+
+**If any PROTOCOL DEVIATION flags were raised:**
+
+Print to user:
+
+```
+⚠️ EDA found [N] potential issue(s) with the pre-specified analysis plan:
+
+[For each PROTOCOL DEVIATION:]
+  - [Variable/test]: [Issue] → Recommended alternative: [alternative]
+
+These adjustments are data-driven and should be documented as deviations from
+the original protocol in the manuscript Methods section (per STROBE/CONSORT).
+
+Do you want to:
+  1. Proceed with the recommended adjustments (will be documented as deviations)
+  2. Proceed with the original plan as pre-specified
+  3. Review the EDA report first: 06_data_extraction/eda_report.md
+```
+
+If the user approves adjustments, carry them forward into Step 3. If not, proceed with the original plan and note in the synthesis report that the pre-specified analysis was retained despite EDA concerns.
+
 ## Step 3: Statistical Analysis
 
 **Statistician agent prompt:**
@@ -75,6 +180,13 @@ STUDY PROTOCOL:
 
 RESEARCH QUESTION:
 [Read and insert 02_research_question/research_question.md]
+
+EXPLORATORY DATA ANALYSIS:
+[Read and insert 06_data_extraction/eda_report.md — use EDA findings to inform analysis decisions:
+  - Use the distribution assessments to choose parametric vs. non-parametric methods
+  - Use the collinearity check to inform variable selection for adjusted models
+  - Apply any user-approved PROTOCOL DEVIATION adjustments from Step 2b
+  - If no EDA report exists (user skipped or data was trivially small), proceed with protocol defaults]
 
 DATA:
 [Read and insert 06_data_extraction/cleaned_data.csv]
