@@ -20,6 +20,8 @@ This plugin coordinates a team of AI agents to execute the full evidence synthes
 - Risk-of-bias appraisal (RoB 2 for RCTs, ROBINS-I for non-randomized studies, NOS, JBI checklists, CASP Qualitative, QUADAS-2 for diagnostic accuracy studies)
 - Executable Python/R analysis scripts (forest plots, funnel plots, bivariate/HSROC DTA analysis, subgroup analyses, sensitivity analyses)
 - Multi-database search construction: PubMed/MEDLINE, Ovid MEDLINE, Embase, CINAHL (with MeSH/Emtree/CINAHL headings, Boolean logic, field tags)
+- API-assisted automation: PubMed E-utilities (search yield testing, volume estimation), Semantic Scholar (semantic search, citation snowballing), OpenAlex (cross-database volume checks), Unpaywall (open-access PDF auto-discovery)
+- Autonomous refinement loops: search strategies auto-tested and adjusted for yield; manuscript revision cycles driven by measurable quality metrics with convergence tracking
 
 ---
 
@@ -55,8 +57,8 @@ Each stage is executed by specialized subagents:
 - Self-review and revision cycles (up to 3 rounds before escalating to you)
 
 **You must do these steps (physically impossible for the AI):**
-1. **Run the database searches** — PubMed, Ovid, Embase require authenticated sessions. The pipeline builds the search strings; you execute and export them.
-2. **Retrieve full-text PDFs** — paywalled articles require institutional access or document delivery. PMC, Unpaywall, and interlibrary loan remain your resources.
+1. **Run the database searches** — PubMed, Ovid, Embase require authenticated sessions. The pipeline builds the search strings and auto-tests PubMed yield via E-utilities API; you execute and export them.
+2. **Retrieve full-text PDFs** — the pipeline auto-checks Unpaywall for open-access PDFs (typically finds 30–60%), so you only need to retrieve the remaining paywalled articles via institutional access or ILL.
 
 **You should verify (AI assists, human judges):**
 - Clinical accuracy of the research question and PICO boundaries

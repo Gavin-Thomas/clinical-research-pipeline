@@ -108,11 +108,66 @@ Apply corrections before outputting.
 OUTPUT: Complete search strategy document with all databases.
 ```
 
-### Step 2: Write Output
+### Step 2: Autonomous Search Yield Testing (PubMed E-utilities)
 
-Write to `04_database_search/search_strategy.md`.
+Before writing the final strategy, programmatically test the PubMed search yield using the E-utilities API. Read `references/api-integrations.md` for endpoint details.
 
-### Step 3: Quick Review with Retry Logic
+**Autonomous Refinement Loop (max 3 iterations):**
+
+```
+iteration = 0
+WHILE iteration < 3:
+
+  1. TRANSLATE the PubMed search strategy into a single URL-encoded query string.
+     Convert line-numbered Boolean blocks into a flat query:
+     - Replace `#N` references with the actual content of line N
+     - Nest OR groups in parentheses
+     - Connect concept blocks with AND
+     - Append date range as &mindate=YYYY/MM/DD&maxdate=YYYY/MM/DD
+     Example: (("artificial intelligence"[MeSH] OR "machine learning"[tiab]) AND ("dermatology"[MeSH] OR "skin diseases"[MeSH]))
+
+  2. TEST: WebFetch the count-only URL:
+     https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term={encoded_query}&retmax=0&retmode=json
+     → Read esearchresult.count
+
+  3. EVALUATE:
+     - count == 0 → TOO RESTRICTIVE
+     - count 1–9 → NARROW (warn but may be acceptable for rare topics)
+     - count 10–500 → ACCEPTABLE → BREAK loop, proceed
+     - count > 500 → TOO BROAD
+
+  4. ADJUST (only if not ACCEPTABLE):
+     - TOO RESTRICTIVE: Remove the most restrictive concept block (usually the
+       outcome or study design filter). Broaden date range by 2 years. Add 2-3
+       more free-text synonyms to the narrowest concept block.
+     - TOO BROAD: Add a study design filter (e.g., clinical trial, randomized
+       controlled trial). Narrow the population concept with more specific MeSH
+       subheadings. Restrict date range.
+     - Log: "Iteration [N]: count=[count], action=[adjustment description]"
+
+  5. INCREMENT iteration
+
+END WHILE
+```
+
+Write the refinement log to the top of the search strategy document:
+
+```markdown
+## Search Yield Testing (automated)
+
+| Iteration | PubMed Query (abbreviated) | Result Count | Action |
+|-----------|---------------------------|-------------|--------|
+| 1 | (AI[MeSH] AND dermatology[MeSH]) | 2,341 | Added RCT filter |
+| 2 | (AI[MeSH] AND dermatology[MeSH]) AND RCT[pt] | 87 | Acceptable — stopped |
+
+Final PubMed yield estimate: **87 records**
+```
+
+If the loop exhausts 3 iterations without reaching an acceptable range, proceed anyway but print a warning to the user with all iteration results so they can manually adjust.
+
+### Step 3: Write Output
+
+Write to `04_database_search/search_strategy.md` (including the yield testing log at the top).
 
 **Review criteria for this stage:**
 - Is the Boolean logic correct (no orphaned operators, proper nesting)?
@@ -129,11 +184,11 @@ On **REVISE** verdict:
 3. Overwrite `04_database_search/search_strategy.md` with corrected version
 4. Increment `review_iteration`; re-dispatch reviewer with revision history in context
 
-On **APPROVE**: proceed to Step 4.
+On **APPROVE**: proceed to Step 5.
 
 On **REJECT** or `review_iteration ≥ 2` without APPROVE: trigger full escalation per reviewer-protocol.md.
 
-### Step 4: Update project.yaml + Manual Handoff
+### Step 5: Update project.yaml + Manual Handoff
 
 Set `stages.database_search: completed`.
 

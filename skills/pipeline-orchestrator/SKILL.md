@@ -35,12 +35,15 @@ test accuracy reviews (QUADAS-2, bivariate/HSROC synthesis, SROC curves), ENTREQ
 qualitative synthesis, STROBE original research, and CARE case reports. All review
 cycles include dual-independent review with automated revision.
 
-Two manual steps are unavoidable:
-  1. Executing database searches (PubMed, Ovid, Embase — requires authenticated sessions)
-  2. Retrieving paywalled full-text PDFs
+Two manual steps remain (though significantly reduced by API integrations):
+  1. Executing database searches — the pipeline now auto-tests PubMed yield
+     via E-utilities API and refines search strategies before you run them
+  2. Retrieving full-text PDFs — the pipeline auto-checks Unpaywall for OA
+     PDFs (typically finds 30-60%), so you only need to retrieve the rest
 
-Everything else is automated. See references/getting-started.md for the full
-methodological capabilities, agent team structure, and manual handoff instructions.
+The pipeline also uses Semantic Scholar for citation snowballing and OpenAlex
+for cross-database volume estimation. See references/api-integrations.md for
+full API documentation and references/getting-started.md for the user guide.
 ```
 
 If the user is unsure what type of review to do, refer them to the "Review Type Decision Guide" in `references/getting-started.md` and guide them interactively using the academic framing (question type, study design, journal expectations) before collecting parameters.
@@ -298,13 +301,17 @@ Screening complete: [N] articles included.
 Included list with DOIs and PMIDs: 05_screening/screened_results.csv
 
 ─────────────────────────────────────────────
-PDF RETRIEVAL (priority order):
-  1. PubMed Central — https://www.ncbi.nlm.nih.gov/pmc/ (free; search by PMID)
-  2. Unpaywall browser extension — unpaywall.org (legal OA; works on journal pages)
-  3. Institutional proxy/VPN — authenticate then search by DOI (https://doi.org/[DOI])
-  4. Interlibrary loan (ILL) — for inaccessible articles; typically 24–72 hours
-  5. Author contact — email corresponding author; most respond quickly
-
+🔓 OPEN ACCESS PDFs (auto-discovered via Unpaywall API):
+  [n_oa]/[n_total] PDFs are freely available!
+  OA PDF links: 05_screening/oa_pdf_links.csv
+  → Download these first — no institutional access needed
+─────────────────────────────────────────────
+REMAINING PAYWALLED PDFs ([n_total - n_oa] articles):
+  1. Institutional proxy/VPN — authenticate then search by DOI
+  2. PubMed Central — https://www.ncbi.nlm.nih.gov/pmc/ (search by PMID)
+  3. Interlibrary loan (ILL) — for inaccessible articles; typically 24–72 hours
+  4. Author contact — email corresponding author; most respond quickly
+─────────────────────────────────────────────
 NAMING: [FirstAuthor]_[Year]_[keyword].pdf (e.g., Smith_2022_dupilumab_AD.pdf)
 DESTINATION: [project_dir]/06_data_extraction/full_texts/
 ─────────────────────────────────────────────

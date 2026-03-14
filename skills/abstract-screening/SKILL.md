@@ -268,7 +268,31 @@ Update `05_screening/screened_results.csv` with revised rows. Increment `review_
 
 **On REJECT verdict or `review_iteration >= 2` with non-APPROVE:** Escalate per `reviewer-protocol.md` — print full escalation banner with all reviewer findings, revision history, and pipeline pause. Do not auto-revise further; human intervention required.
 
-### Step 5: Update project.yaml + Manual Handoff
+### Step 5: Unpaywall OA PDF Auto-Discovery
+
+After screening is complete, automatically check Unpaywall for open-access PDFs of all included studies. Read `references/api-integrations.md` for endpoint details.
+
+**Process:**
+
+1. Read `05_screening/screened_results.csv` — filter to rows where `final_decision = INCLUDE`
+2. For each included study with a non-empty DOI:
+   - WebFetch: `https://api.unpaywall.org/v2/{DOI}?email=pipeline@research.edu`
+   - Parse the JSON response:
+     - `is_oa` → boolean
+     - `best_oa_location.url_for_pdf` → direct PDF URL (may be null even if is_oa is true)
+     - `best_oa_location.url_for_landing_page` → fallback landing page
+     - `best_oa_location.host_type` → "publisher" or "repository"
+   - Rate limit: add a 200ms delay between requests
+   - If WebFetch fails for a DOI, log the failure and continue
+
+3. Write results to `05_screening/oa_pdf_links.csv`:
+   ```csv
+   record_id,doi,is_oa,pdf_url,landing_page_url,host_type
+   ```
+
+4. Count: `n_oa` = OA PDFs found; `n_total` = total included with DOIs
+
+### Step 6: Update project.yaml + Manual Handoff
 
 Set `stages.abstract_screening: completed`.
 
@@ -286,10 +310,13 @@ Print:
 - Conflicts (for human review): [N]
 - Inter-rater agreement: [kappa]
 
+🔓 Open Access: [n_oa]/[n_total] PDFs freely available (see oa_pdf_links.csv)
+
 📋 MANUAL STEP REQUIRED:
 1. Review any CONFLICT items in screened_results.csv
-2. Pull full-text PDFs for all INCLUDED articles (DOIs/PMIDs in screened_results.csv)
-3. Place PDFs in: 06_data_extraction/full_texts/
+2. Download OA PDFs from links in: 05_screening/oa_pdf_links.csv
+3. For remaining paywalled articles, use institutional access or ILL
+4. Place ALL PDFs in: 06_data_extraction/full_texts/
 
 When you're done, run /data-extraction to continue.
 ```

@@ -294,23 +294,59 @@ Tables & Figures:
 - Is table and figure numbering sequential and consistent?
 - Are figure legends self-contained?
 
-**Review iteration loop:**
+**Autonomous Quality-Metric Iteration Loop (autoresearch-inspired):**
 
-On **APPROVE** (majority): proceed to Step 6.
+Instead of relying solely on reviewer verdicts, track measurable quality metrics across revision cycles. This ensures the pipeline converges toward a publishable manuscript rather than cycling indefinitely.
 
-On **REVISE** (any reviewer):
-- Build a REVISION REQUIRED table consolidating all reviewer findings:
-  | Reviewer | Category | Finding | Location in Manuscript | Required Action |
-  |----------|----------|---------|------------------------|----------------|
-- Re-dispatch the merge agent with: (1) current `manuscript.md`, (2) the REVISION REQUIRED table, (3) instruction to address each finding in turn and annotate which were addressed
-- Update `07_manuscript/manuscript.md` with revised content
-- Increment `review_iteration += 1`
-- Re-dispatch Full Review with revision history prepended to reviewer context
+```
+Initialize:
+  review_iteration = 0
+  quality_log = []
 
-On **REJECT** (any reviewer) or `review_iteration ≥ 2` without APPROVE:
-- Trigger full escalation per `references/reviewer-protocol.md`
-- Print escalation banner with: all reviewer findings across iterations, revision notes, and specific unresolved issues
-- Pause pipeline and present to user for resolution before proceeding to Step 6
+LOOP:
+  1. DISPATCH Full Review (two independent reviewers per reviewer-protocol.md)
+
+  2. MEASURE quality metrics from reviewer outputs:
+     - critical_count = number of findings with Severity = "Critical"
+     - major_count = number of findings with Severity = "Major"
+     - minor_count = number of findings with Severity = "Minor"
+     - quality_score = max(0, 100 - (critical_count × 25) - (major_count × 10) - (minor_count × 2))
+
+  3. LOG: Append to quality_log:
+     | Iteration | Critical | Major | Minor | Score | Verdict | Action |
+
+  4. EVALUATE (try → measure → keep/discard logic):
+     - APPROVE (majority verdict) OR quality_score ≥ 90 with 0 critical:
+       → ACCEPT manuscript. Break loop. Proceed to Step 6.
+     - REVISE with quality_score improving vs. previous iteration:
+       → KEEP iterating. Build REVISION REQUIRED table. Re-dispatch merge agent.
+       → Increment review_iteration.
+     - REVISE with quality_score NOT improving (stalled or regressing):
+       → STOP iterating. Escalate to user with quality_log showing the plateau.
+     - REJECT or review_iteration ≥ 3:
+       → STOP. Full escalation per reviewer-protocol.md.
+
+  5. After merge agent revision:
+     - Re-dispatch Proofreader on revised manuscript (catch new errors introduced by revision)
+     - If Proofreader finds new Errors: apply fixes before next review cycle
+     - Continue to top of LOOP
+```
+
+Write the quality log to `07_manuscript/revision_log.md`:
+
+```markdown
+# Manuscript Revision Log
+
+| Iteration | Critical | Major | Minor | Score | Verdict | Changes Made |
+|-----------|----------|-------|-------|-------|---------|-------------|
+| 0 | 2 | 5 | 8 | 24 | REVISE | Initial review |
+| 1 | 0 | 2 | 4 | 72 | REVISE | Fixed 2 critical (PRISMA flow, CI reporting), 3 major |
+| 2 | 0 | 0 | 3 | 94 | APPROVE | Fixed remaining major issues |
+
+Final quality score: **94/100**
+```
+
+On escalation, print the full quality log so the user can see exactly where the manuscript stalled and what remains unresolved.
 
 ### Step 6: Update project.yaml
 

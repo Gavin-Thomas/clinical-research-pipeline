@@ -22,40 +22,67 @@ If no `project.yaml` exists, ask the user for the topic and create a minimal one
 
 ### Step 1: Dispatch Librarian Agent
 
-Dispatch an Agent subagent with the Librarian role. Read `references/agent-roles.md` for the Librarian system prompt.
+Dispatch an Agent subagent with the Librarian role. Read `references/agent-roles.md` for the Librarian system prompt. Read `references/api-integrations.md` for API endpoint details.
 
 **Librarian agent prompt:**
 
 ```
 [Insert Librarian system prompt from agent-roles.md]
 
-TASK: Conduct a preliminary landscape survey on the following topic:
+TASK: Conduct a comprehensive landscape survey on the following topic using both web searches AND programmatic API queries.
 
 Topic: [from project.yaml or user input]
 Project type: [from project.yaml]
+
+## Phase A: Web Search (breadth)
 
 Using WebSearch and WebFetch, search for:
 1. Recent systematic reviews and meta-analyses on this topic (last 5 years)
 2. Key landmark studies
 3. Current trends and emerging subtopics
 4. Known gaps identified in existing review articles
-5. Volume of literature (approximate number of studies)
 
 Search these sources:
 - PubMed: site:pubmed.ncbi.nlm.nih.gov [topic keywords]
 - Google Scholar: [topic keywords] systematic review OR meta-analysis
 - Preprint servers: site:medrxiv.org OR site:biorxiv.org [topic keywords]
 
-IMPORTANT: These are general web searches, not direct database API queries. Results provide a preliminary overview that supplements the PI's domain knowledge.
+## Phase B: API-Driven Search (depth and precision)
+
+After web searching, use WebFetch to query these APIs for structured data:
+
+**B1. PubMed E-utilities — Volume estimation and recent abstracts**
+1. Build a PubMed query from the topic keywords (URL-encode it)
+2. WebFetch: `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term={query}&retmax=0&retmode=json`
+   → Read `esearchresult.count` to get total volume
+3. WebFetch with `retmax=20&sort=relevance` to get top 20 PMIDs
+4. WebFetch: `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id={pmid_list}&rettype=abstract&retmode=xml`
+   → Extract titles, abstracts, MeSH terms from the top results
+5. Report: "PubMed contains approximately [N] articles matching [query]"
+
+**B2. Semantic Scholar — Semantic search + citation snowballing**
+1. WebFetch: `https://api.semanticscholar.org/graph/v1/paper/search?query={topic}&limit=20&fields=paperId,title,abstract,year,citationCount,authors,externalIds,tldr&fieldsOfStudy=Medicine`
+   → Find semantically related papers that keyword search may miss
+2. From the top 3 most-cited results, fetch their citations:
+   WebFetch: `https://api.semanticscholar.org/graph/v1/paper/{paperId}/citations?fields=title,year,citationCount&limit=50`
+   → Identify highly-cited papers not found in Phase A (citation snowballing)
+
+**B3. OpenAlex — Cross-reference volume and concept mapping**
+1. WebFetch: `https://api.openalex.org/works?filter=default.search:{topic},publication_year:2020-2026&per_page=1`
+   → Read `meta.count` for total works estimate
+2. Compare OpenAlex count vs. PubMed count — large discrepancy suggests relevant literature outside PubMed (conference papers, grey literature)
+
+IMPORTANT: If any API call fails (timeout, rate limit, malformed URL), log the failure and continue with available data. API results supplement web searches — they are not required for the landscape report to be valid.
 
 OUTPUT: Write a structured landscape report in markdown with these sections:
-1. Search Summary (sources searched, date, approximate results)
-2. Existing Reviews (list with citations)
-3. Key Studies (landmark papers)
-4. Current Trends
-5. Identified Gaps
-6. Volume Assessment
-7. Preliminary Bibliography
+1. Search Summary (sources searched — web + APIs, date, approximate results)
+2. Volume Assessment (PubMed count, OpenAlex count, Semantic Scholar results — note any discrepancies)
+3. Existing Reviews (list with citations)
+4. Key Studies (landmark papers — from both web search and API results)
+5. Citation Snowball Findings (papers discovered through Semantic Scholar citation traversal that were NOT found in web searches — if any)
+6. Current Trends
+7. Identified Gaps
+8. Preliminary Bibliography
 
 **SELF-CHECK (required before writing output to disk):**
 
@@ -63,8 +90,10 @@ Before producing output, verify each item and correct any issues inline:
 
 Coverage:
 - [ ] At least 3 distinct databases/sources searched (PubMed, Google Scholar, preprint server)
+- [ ] At least 2 APIs queried (PubMed E-utilities for volume count, Semantic Scholar for semantic search) — if API calls failed, note the failure reason
 - [ ] At least 5 existing reviews or meta-analyses identified, if literature volume supports it
 - [ ] Search terms included synonyms and MeSH-equivalent concepts (not just the verbatim topic phrase)
+- [ ] Citation snowballing attempted on at least 2 landmark papers via Semantic Scholar citations endpoint
 
 Quality of Identified Gaps:
 - [ ] Each gap is specific and falsifiable (not generic like "more research is needed")
