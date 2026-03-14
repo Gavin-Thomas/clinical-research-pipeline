@@ -1,9 +1,15 @@
-# Data Extraction — case_report
+# Data Extraction — case_report / case_series
+
+This file handles both `case_report` (single patient) and `case_series` (multiple patients).
+
+**For `case_series`:** Steps 1–5 are executed once per patient. The PI must process clinical materials for each patient separately, producing an individual case presentation for each. After all individual cases are complete, Step 5b adds a cross-case comparison.
+
+Read `project.yaml` to determine `project_type`. If `case_series`, also read `review_config.n_cases` for the expected number of patients.
 
 Case report data extraction uses the **PI** and **Manuscript Writer** agents to structure a clinical
 case presentation per CARE (CAse REport) guidelines. Unlike review-type extractions that pull
 quantitative data from many papers, this process distills clinical materials (notes, labs, imaging,
-pathology) into a single structured case narrative with literature context.
+pathology) into structured case narrative(s) with literature context.
 
 ---
 
@@ -353,9 +359,66 @@ Pause pipeline — do not proceed to Step 6.
 
 ---
 
+## Step 5b: Cross-Case Comparison (case_series only)
+
+**Skip this step if `project_type` is `case_report`.** Only execute for `case_series`.
+
+Read `project.yaml`. If `project_type: case_series`:
+
+**Dispatch PI agent for cross-case analysis:**
+
+```
+[Insert PI system prompt from agent-roles.md]
+
+TASK: Produce a cross-case comparison for this case series.
+
+CASE PRESENTATION:
+[Read and insert 06_data_extraction/case_presentation.md — all individual cases]
+
+N_CASES: [from project.yaml review_config.n_cases]
+
+Produce:
+
+1. **Cross-Case Summary Table**
+   Rows = one per patient (Patient 1, Patient 2, ..., Patient N)
+   Columns = Age | Sex | Primary Diagnosis | Key Clinical Feature | Treatment | Outcome | Follow-up Duration
+
+2. **Descriptive Statistics**
+   - Age: median (range)
+   - Sex: n (%) male / female
+   - Diagnosis: frequency per diagnosis category (if heterogeneous)
+   - Treatment: frequency per treatment modality
+   - Outcome: frequency per outcome category (resolved, improved, unchanged, worsened, died)
+   - Follow-up duration: median (range)
+
+3. **Common Themes**
+   - What clinical features, diagnostic challenges, or treatment decisions are shared across cases?
+   - What distinguishes the cases from each other?
+   - Are there any patterns (e.g., all patients under 40, all failed first-line therapy)?
+
+4. **Clinical Implications of the Series**
+   - What does this series collectively teach that individual cases do not?
+   - What hypothesis or clinical recommendation does the pattern suggest?
+   - How does this series compare to published case series on this topic (from landscape_report.md)?
+
+SELF-CHECK:
+- [ ] Summary table has exactly [n_cases] rows — no patient missing
+- [ ] Descriptive statistics are arithmetically correct (verify at least one count against the table)
+- [ ] Common themes are grounded in specific case features, not generic observations
+- [ ] No PHI in the summary table — patients identified only as Patient 1, 2, etc.
+
+OUTPUT: Append to case_presentation.md under "## Cross-Case Comparison"
+```
+
+Append the cross-case comparison to `06_data_extraction/case_presentation.md`.
+
+---
+
 ## Step 6: Update project.yaml
 
 Set `stages.data_extraction: completed`.
+
+**For `case_report`:**
 
 Print:
 
@@ -375,6 +438,29 @@ Sections written:
   • Literature Context and Clinical Implications
 
 CARE guideline compliance: verified by Quick Review
+PHI check: passed (no identifiers detected)
+
+Next stage: manuscript writing (Stage 7)
+```
+
+**For `case_series`:**
+
+Print:
+
+```
+✅ Case series data extraction complete.
+
+Output: 06_data_extraction/case_presentation.md
+
+Sections written:
+  • Individual case presentations (×[n_cases] patients)
+  • Cross-Case Summary Table
+  • Descriptive Statistics (demographics, treatment, outcomes)
+  • Common Themes and Distinguishing Features
+  • Clinical Implications of the Series
+  • Literature Context
+
+CARE guideline compliance: verified per patient
 PHI check: passed (no identifiers detected)
 
 Next stage: manuscript writing (Stage 7)

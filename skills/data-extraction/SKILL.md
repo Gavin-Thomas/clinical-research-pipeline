@@ -80,10 +80,6 @@ During Step 5 (Statistician synthesis), if studies report contradictory findings
 
 If more than 10 papers to extract, batch at 10 per invocation. Track in `06_data_extraction/extraction_progress.yaml`.
 
-## Process — scoping_review
-
-Read `skills/data-extraction/section-scoping-review.md` and follow it exactly.
-
 ## Process — Review Types (systematic_review, meta_analysis)
 
 ### Step 1: Dispatch Statistician for Template Design
