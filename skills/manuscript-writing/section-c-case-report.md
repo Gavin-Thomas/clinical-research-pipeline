@@ -175,6 +175,37 @@ OUTPUT: Complete case report manuscript in markdown + references in BibTeX forma
 
 Write to `07_manuscript/manuscript.md` and `07_manuscript/references.bib`.
 
+### C4b: Proofreader Pass
+
+Dispatch a Proofreader agent to catch linguistic, structural, and formatting issues.
+
+**Proofreader agent prompt:**
+
+```
+[Insert Proofreader system prompt from agent-roles.md]
+
+TASK: Proofread the following case report manuscript before peer review.
+
+MANUSCRIPT: [Read 07_manuscript/manuscript.md]
+TARGET JOURNAL: [from project.yaml]
+JOURNAL GUIDELINES: [Insert fetched guidelines summary]
+REPORTING STANDARD: CARE 2013 (13 items)
+
+Perform a full proofread. In addition to standard checks, verify:
+- CARE items 1–13 are all addressed
+- Patient privacy: no identifying information (name, DOB, specific calendar dates)
+- Timeline section uses relative dates (Day 0, Week 2), not calendar dates
+- Informed consent statement present
+- No statistical pooling or review-type language
+- Clinical terminology is precise and consistent throughout
+
+OUTPUT: Proofread report in the standard format.
+```
+
+Write to `07_manuscript/proofread_report.md`.
+
+If Errors found: re-dispatch merge agent to apply corrections, then proceed.
+
 ### C5: Full Review + Update project.yaml
 
 Dispatch Full Review per `references/reviewer-protocol.md`. Initialize `review_iteration = 0`.

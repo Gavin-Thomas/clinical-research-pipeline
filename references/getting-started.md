@@ -34,7 +34,9 @@ Each stage is executed by specialized subagents:
 | **Methodologist** | Eligibility criteria development, reporting guideline compliance (PRISMA/STROBE/CARE), bias tool selection |
 | **Data Extractor (×3)** | Triple-independent abstract screening and full-text data extraction with consensus |
 | **Statistician** | Extraction template design, meta-analytic pooling, heterogeneity analysis, GRADE, executable analysis scripts |
+| **Programmer** | Code review and validation of all Python/R analysis scripts — catches bugs, verifies statistical method implementation, ensures scripts run end-to-end |
 | **Manuscript Writer (×2)** | Dual-independent IMRAD drafting, journal-specific formatting |
+| **Proofreader** | Independent linguistic and formatting quality assurance — grammar, tense, abbreviations, citation integrity, reporting guideline checklist, AI-writing artifact detection |
 | **Independent Reviewer (×2+1)** | Two-tier quality review (Quick Review for stages 1–4, Full Review for stages 5–7), with a tie-breaking third reviewer on disagreement |
 
 ---

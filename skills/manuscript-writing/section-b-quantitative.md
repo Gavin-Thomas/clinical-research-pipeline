@@ -228,6 +228,34 @@ OUTPUT: Complete manuscript in markdown + references in BibTeX format.
 Write manuscript to `07_manuscript/manuscript.md`.
 Write references to `07_manuscript/references.bib`.
 
+### Step 4b: Proofreader Pass
+
+Dispatch a Proofreader agent to catch linguistic, structural, and formatting issues that self-checks miss.
+
+**Proofreader agent prompt:**
+
+```
+[Insert Proofreader system prompt from agent-roles.md]
+
+TASK: Proofread the following manuscript before it goes to peer review.
+
+MANUSCRIPT: [Read 07_manuscript/manuscript.md]
+TARGET JOURNAL: [from project.yaml]
+JOURNAL GUIDELINES: [Insert fetched guidelines summary — word limits, reference style, section order]
+REPORTING STANDARD: [from project.yaml review_config.reporting_standard]
+
+Perform a full proofread. Check: grammar, tense consistency, abbreviation management, number/unit conventions, citation integrity, table/figure cross-references, journal compliance (word limits, section order), and reporting guideline checklist. Also flag AI-writing artifacts.
+
+OUTPUT: Proofread report in the standard format.
+```
+
+Write proofread report to `07_manuscript/proofread_report.md`.
+
+If the Proofreader finds **Errors** (not just Suggestions or Queries):
+- Re-dispatch the merge agent with: (1) current `manuscript.md`, (2) the Proofreader's Error findings only, (3) instruction to apply each correction
+- Update `07_manuscript/manuscript.md` with corrections
+- Do NOT re-run the Proofreader — proceed to Full Review
+
 ### Step 5: Full Review
 
 Dispatch Full Review per `references/reviewer-protocol.md`. Initialize `review_iteration = 0`.

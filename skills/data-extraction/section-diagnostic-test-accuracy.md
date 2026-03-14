@@ -107,7 +107,40 @@ OUTPUT: (1) Synthesis report in markdown; (2) executable R script written to dis
 Write report to `06_data_extraction/synthesis_report.md`.
 Write R script to `06_data_extraction/analysis_scripts/dta_analysis.R`.
 
-After synthesis, dispatch Full Review per `references/reviewer-protocol.md`. Follow the same
+## Step 5b: Programmer Code Review (DTA)
+
+Dispatch Programmer agent to validate `dta_analysis.R`.
+
+**Programmer agent prompt:**
+
+```
+[Insert Programmer system prompt from agent-roles.md]
+
+TASK: Review and validate the DTA analysis R script.
+
+SCRIPT: [Read 06_data_extraction/analysis_scripts/dta_analysis.R]
+DATA COLUMNS: [Read first 3 lines of 06_data_extraction/extracted_data.csv]
+
+DTA-specific checks (in addition to standard code review):
+1. `library(mada)` is loaded; `reitsma()` and/or `hsroc()` are called correctly
+2. 2×2 table inputs (TP, FP, FN, TN) are extracted from the correct CSV columns
+3. Studies with NR values in TP/FP/FN/TN columns are filtered out before model fitting
+4. Sensitivity and specificity are on the 0–1 scale (not 0–100) in all calculations
+5. SROC ellipse uses `ROCellipse()` or equivalent — not a manually drawn circle
+6. Deeks' funnel plot uses effective sample size (ESS) on the x-axis, not raw N
+7. I² is calculated separately for sensitivity and specificity (logit-transformed)
+8. Forest plot code produces paired plots (sensitivity forest + specificity forest)
+9. All output PNGs saved to analysis_scripts/outputs/ with descriptive filenames
+10. QUADAS-2 traffic light plot code reads the correct q2_* columns from the CSV
+
+Fix any issues in-place and document changes.
+
+OUTPUT: Code review report + corrected script if needed.
+```
+
+Write code review to `06_data_extraction/analysis_scripts/code_review.md`.
+
+After Programmer review, dispatch Full Review per `references/reviewer-protocol.md`. Follow the same
 iteration/escalation logic as the systematic review path (initialize `review_iteration = 0`).
 
 ## Step 6: Update project.yaml

@@ -169,6 +169,37 @@ If any check fails, correct before producing final output.
 
 Write output to `07_manuscript/manuscript.md` and `07_manuscript/references.bib`.
 
+### D3b: Proofreader Pass
+
+Dispatch a Proofreader agent for linguistic, structural, and formatting quality assurance.
+
+**Proofreader agent prompt:**
+
+```
+[Insert Proofreader system prompt from agent-roles.md]
+
+TASK: Proofread the following diagnostic test accuracy manuscript before peer review.
+
+MANUSCRIPT: [Read 07_manuscript/manuscript.md]
+TARGET JOURNAL: [from project.yaml]
+JOURNAL GUIDELINES: [Insert fetched guidelines summary]
+REPORTING STANDARD: STARD 2015 (30 items)
+
+Perform a full proofread. In addition to standard checks, verify:
+- STARD 2015 items 1–30 checklist adherence
+- Sensitivity/specificity are reported consistently (proportions vs. percentages — pick one and use throughout)
+- All DTA abbreviations defined: QUADAS-2, SROC, HSROC, DOR, LR+, LR−, AUC, CI, GRADE-DTA, ESS
+- No treatment-effect or relative-risk language (inappropriate for diagnostic accuracy)
+- All 5 figures referenced by number: QUADAS-2 traffic light, sensitivity forest, specificity forest, SROC curve, Fagan nomogram
+- Clinical utility framing uses LR+/LR− with pre-test probability, not just sensitivity/specificity
+
+OUTPUT: Proofread report in the standard format.
+```
+
+Write to `07_manuscript/proofread_report.md`.
+
+If Errors found: re-dispatch merge agent to apply corrections, then proceed.
+
 ### D4: Full Review + Update project.yaml
 
 Dispatch Full Review per `references/reviewer-protocol.md`. Initialize `review_iteration = 0`.

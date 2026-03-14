@@ -147,6 +147,43 @@ OUTPUT: (1) Synthesis report in markdown written to 06_data_extraction/synthesis
 Write synthesis report to `06_data_extraction/synthesis_report.md`.
 Write analysis script to `06_data_extraction/analysis_scripts/primary_analysis.py` (or `.R`).
 
+## Step 3b: Programmer Code Review
+
+Dispatch Programmer agent to validate the primary analysis script before review.
+
+**Programmer agent prompt:**
+
+```
+[Insert Programmer system prompt from agent-roles.md]
+
+TASK: Review and validate the primary analysis script for this original research study.
+
+SCRIPT: [Read 06_data_extraction/analysis_scripts/primary_analysis.py or .R]
+
+STUDY PROTOCOL: [Read 03_inclusion_exclusion/study_protocol.md — for specified statistical methods]
+
+DATA COLUMNS: [Read first 3 lines of 06_data_extraction/cleaned_data.csv]
+
+Review for:
+1. All imports/libraries present — script runs without installing unlisted packages
+2. Input path matches: 06_data_extraction/cleaned_data.csv
+3. Output paths: analysis_scripts/outputs/ — directory created if absent
+4. Column names in code match actual CSV headers
+5. Statistical test matches protocol specification (e.g., logistic regression if binary outcome, Cox if time-to-event)
+6. For adjusted models: covariates listed match those in study_protocol.md
+7. Missing data handling: NR/NA values handled before analysis, imputation method matches protocol if >5% missing
+8. Table 1 generation: correct descriptive stats (mean±SD for normal, median(IQR) for skewed, n(%) for categorical)
+9. No p-values in Table 1 for RCT designs
+10. Subgroup forest plot code produces readable output with interaction p-values
+11. All output figures saved as PNG; results CSVs saved; stdout summary printed
+
+Fix any issues in-place and document changes.
+
+OUTPUT: Code review report + corrected script if needed.
+```
+
+Write code review to `06_data_extraction/analysis_scripts/code_review.md`.
+
 ## Step 4: Full Review
 
 Initialize `review_iteration = 0`. Dispatch Full Review per `references/reviewer-protocol.md` on `06_data_extraction/synthesis_report.md` and the analysis script(s) in `06_data_extraction/analysis_scripts/`.

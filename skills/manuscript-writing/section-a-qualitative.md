@@ -112,6 +112,36 @@ Qualitative-Specific Self-Check:
 
 Write output to `07_manuscript/manuscript.md` and `07_manuscript/references.bib`.
 
+### A3b: Proofreader Pass
+
+Dispatch a Proofreader agent to catch linguistic, structural, and formatting issues.
+
+**Proofreader agent prompt:**
+
+```
+[Insert Proofreader system prompt from agent-roles.md]
+
+TASK: Proofread the following qualitative synthesis manuscript before peer review.
+
+MANUSCRIPT: [Read 07_manuscript/manuscript.md]
+TARGET JOURNAL: [from project.yaml]
+JOURNAL GUIDELINES: [Insert fetched guidelines summary]
+REPORTING STANDARD: ENTREQ (21 items)
+
+Perform a full proofread. In addition to standard checks, verify:
+- No statistical pooling language (forest plots, effect sizes, heterogeneity) — inappropriate for qualitative synthesis
+- Verbatim quotes are properly attributed with source citations
+- CERQual ratings are consistently formatted
+- ENTREQ items 1–21 are all addressable
+- No unsupported causal language — qualitative findings describe perceptions/experiences
+
+OUTPUT: Proofread report in the standard format.
+```
+
+Write to `07_manuscript/proofread_report.md`.
+
+If Errors found: re-dispatch merge agent to apply corrections, then proceed.
+
 ### A4: Full Review + Update project.yaml
 
 Dispatch Full Review per `references/reviewer-protocol.md` using the same review iteration loop as Step 5 in Section B. Initialize `review_iteration = 0`.

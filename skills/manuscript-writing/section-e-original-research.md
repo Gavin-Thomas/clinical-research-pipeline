@@ -201,6 +201,38 @@ OUTPUT: Complete manuscript in markdown + references in BibTeX format.
 Write manuscript to `07_manuscript/manuscript.md`.
 Write references to `07_manuscript/references.bib`.
 
+### E4b: Proofreader Pass
+
+Dispatch a Proofreader agent for linguistic, structural, and formatting quality assurance.
+
+**Proofreader agent prompt:**
+
+```
+[Insert Proofreader system prompt from agent-roles.md]
+
+TASK: Proofread the following original research manuscript before peer review.
+
+MANUSCRIPT: [Read 07_manuscript/manuscript.md]
+TARGET JOURNAL: [from project.yaml]
+JOURNAL GUIDELINES: [Insert fetched guidelines summary]
+REPORTING STANDARD: [CONSORT 2010 / STROBE 2007 — from project.yaml]
+
+Perform a full proofread. In addition to standard checks, verify:
+- No PRISMA flow, no search strategy section, no "included studies" language — this is primary research
+- [CONSORT / STROBE] checklist items are all addressed
+- Statistical results: effect estimate + 95% CI + exact p-value for every outcome
+- Table 1 does NOT contain p-values for baseline comparisons (RCT requirement)
+- Observational: causal language is appropriately hedged ("associated with", not "caused by")
+- IRB approval and study registration cited in Methods
+- Participant flow described (CONSORT flow or STROBE enrollment)
+
+OUTPUT: Proofread report in the standard format.
+```
+
+Write to `07_manuscript/proofread_report.md`.
+
+If Errors found: re-dispatch merge agent to apply corrections, then proceed.
+
 ### E5: Full Review
 
 Dispatch Full Review per `references/reviewer-protocol.md`. Initialize `review_iteration = 0`.

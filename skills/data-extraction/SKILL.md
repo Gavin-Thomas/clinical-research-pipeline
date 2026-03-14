@@ -225,6 +225,47 @@ OUTPUT: (1) Complete meta-analysis results report in markdown, (2) executable an
 Write report to `06_data_extraction/meta_analysis_results.md`.
 Write analysis script to `06_data_extraction/analysis_scripts/meta_analysis_primary.py`.
 
+### Step 6a-verify: Programmer Code Review
+
+After the Statistician writes analysis scripts, dispatch a Programmer agent to validate them before proceeding.
+
+**Programmer agent prompt:**
+
+```
+[Insert Programmer system prompt from agent-roles.md]
+
+TASK: Review and validate the analysis script(s) written by the Statistician.
+
+SCRIPTS TO REVIEW:
+[List all .py and .R files in 06_data_extraction/analysis_scripts/]
+
+EXTRACTION DATA (for column name validation):
+[Read first 3 lines of 06_data_extraction/extracted_data.csv]
+
+PROJECT CONFIGURATION:
+[Read project.yaml — check meta_analysis, network_meta_analysis, subgroup_analyses, sensitivity_analyses]
+
+Review each script for:
+1. All imports present and correct (no missing packages)
+2. Input file path matches: 06_data_extraction/extracted_data.csv
+3. Output paths exist or are created: 06_data_extraction/analysis_scripts/outputs/
+4. Column names in code match actual CSV column headers — flag any mismatches
+5. Statistical method matches project.yaml specification (REML vs DL, fixed vs random)
+6. Effect size formulas are correct for the data type (OR from counts, MD from means±SD, etc.)
+7. Edge cases handled: NR values filtered before numeric operations, single-study subgroups, zero events
+8. Random seed set for any stochastic operations
+9. Output figures saved with descriptive filenames
+10. Final stdout summary prints key results
+
+If any issue is found:
+- Fix the script in place (write the corrected version to the same path)
+- Document every change in a code review report
+
+OUTPUT: Code review report + corrected script(s) if needed.
+```
+
+Write code review report to `06_data_extraction/analysis_scripts/code_review.md`.
+
 ### Step 6b (network_meta_analysis only): Network Meta-Analysis
 
 If `review_config.network_meta_analysis` is `true` in project.yaml, also dispatch:
@@ -277,6 +318,18 @@ OUTPUT: Complete NMA results in markdown + executable analysis script written to
 
 Write to `06_data_extraction/nma_results.md`.
 Write analysis script to `06_data_extraction/analysis_scripts/nma_analysis.R`.
+
+### Step 6b-verify: Programmer Code Review (NMA)
+
+Dispatch Programmer agent to review the NMA script using the same prompt template as Step 6a-verify, but targeting `nma_analysis.R` (or `.py`). Additional NMA-specific checks:
+
+- Correct network geometry construction (treatment nodes, comparison edges)
+- Consistency model specification (consistency vs. inconsistency model)
+- For Bayesian: chain count ≥ 4, iterations ≥ 10,000, convergence diagnostics (R-hat, ESS) are computed and printed
+- SUCRA/P-score calculations use the correct posterior samples or frequentist estimates
+- League table output is a proper pairwise matrix (symmetric, diagonal = reference)
+
+Append NMA review to `06_data_extraction/analysis_scripts/code_review.md`.
 
 ### Step 7: Update project.yaml
 

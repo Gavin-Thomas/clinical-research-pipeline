@@ -26,7 +26,8 @@ If the user seems unfamiliar with the pipeline (e.g., says "how do I start", "wh
 ```
 This pipeline runs a full evidence synthesis workflow — from landscape search to
 submission-ready manuscript — using a coordinated team of AI agents (Librarian, PI,
-Methodologist, Data Extractors ×3, Statistician, Writers ×2, Independent Reviewers).
+Methodologist, Data Extractors ×3, Statistician, Programmer, Writers ×2, Proofreader,
+Independent Reviewers).
 
 Supported outputs: PRISMA 2020 systematic reviews, PRISMA-ScR scoping reviews,
 meta-analyses (random-effects pooling, GRADE, forest/funnel plots), STARD diagnostic
