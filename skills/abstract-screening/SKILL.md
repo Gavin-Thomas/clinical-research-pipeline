@@ -119,20 +119,55 @@ If a record cannot be parsed (missing title, missing abstract, malformed RIS tag
 - Report count of parse failures in the final summary message
 - If >10% of records fail to parse, warn the user that the file may be in an unsupported format
 
-### Very Large Result Sets (>500 abstracts)
+### Screening Volume Context
 
-Standard batching at 50/batch applies automatically. Additional handling for large sets:
-- For N > 200 with >50% INCLUDE rate after batch 1: flag to user — inclusion criteria may be too permissive
-- Save an interim summary `05_screening/screening_summary_interim.md` after every 5 batches with running totals (screened, included, excluded, conflicts)
-- If N > 500: recommend the user consider narrowing the search strategy (see `/database-search-build`) before completing all batches
+Typical high-quality systematic reviews screen 1,000–3,000 records after deduplication.
+Scoping reviews may screen 2,000–5,000+. Approximately 90% of records are excluded at
+title/abstract screening (3–5% final inclusion rate is normal). The pipeline must handle
+these volumes without recommending users narrow searches that are appropriately sensitive.
+
+### Volume-Aware Handling by Project Type
+
+After deduplication, check `project_type` and apply the appropriate guidance:
+
+| project_type | Expected range | Flag if below | Warn (may be broad) | Alert (very large) |
+|---|---|---|---|---|
+| systematic_review / meta_analysis | 200–2,000 | <100 (may miss studies) | >2,000 | >5,000 |
+| scoping_review | 500–5,000 | <200 | >5,000 | >10,000 |
+| rapid_review | 50–500 | <30 | >500 | >1,000 |
+| qualitative_synthesis | 100–1,000 | <50 | >1,000 | >2,000 |
+| diagnostic_test_accuracy | 100–1,000 | <50 | >1,000 | >2,000 |
+
+Actions:
+- **Below expected range**: Print warning — search may be too restrictive; check if key databases were missed or search terms too narrow. Do NOT auto-recommend narrowing.
+- **Within expected range**: Proceed normally. Print: "📊 [N] records to screen — typical for a [project_type]."
+- **Warn threshold**: Print advisory — screening is feasible but substantial. Suggest the user confirm they want to proceed or consider adding study design filters. Do NOT recommend narrowing for systematic_review or meta_analysis — comprehensive search is methodologically required.
+- **Alert threshold**: Print alert — screening volume is very large. Offer options: (a) proceed with full screening (pipeline handles it), (b) add filters to reduce volume, (c) consider whether this should be a scoping review instead. For scoping_review, large volumes are expected — just confirm.
+
+### Inclusion Rate Monitoring
+
+After the first 2 batches (not just batch 1), calculate the running inclusion rate:
+- If inclusion rate > 50% AND N > 200: flag — criteria may be too permissive (expected: 5–15% inclusion)
+- If inclusion rate < 2% AND N > 200: flag — criteria may be too restrictive or search strategy misaligned with PICO
+- Save an interim summary `05_screening/screening_summary_interim.md` after every 5 batches with running totals (screened, included, excluded, conflicts, running inclusion rate)
 
 ## Batching
 
-If the total number of abstracts exceeds 50:
-1. Create `05_screening/screening_progress.yaml` with `total_items`, `batch_size: 50`, `batches_completed: 0`
+Batch size scales with screening volume to balance thoroughness and efficiency:
+
+| Total records | Batch size | Rationale |
+|---|---|---|
+| ≤100 | 50 | Small set — standard batching |
+| 101–500 | 75 | Moderate — slightly larger batches |
+| 501–2,000 | 100 | Large — reduce total batch count |
+| >2,000 | 150 | Very large — maximize throughput while maintaining screening quality |
+
+If the total number of abstracts exceeds the batch size:
+1. Create `05_screening/screening_progress.yaml` with `total_items`, `batch_size: [from table above]`, `batches_completed: 0`, `estimated_batches: [total/batch_size]`
 2. Process one batch per invocation
 3. Each subsequent invocation reads `screening_progress.yaml` and picks up the next batch
 4. Append results to `05_screening/screened_results.csv` (don't overwrite previous batches)
+5. Print progress after each batch: "📊 Batch [N]/[total_batches] complete — [screened]/[total] records screened ([included] included so far)"
 
 ## Project-Type Routing
 

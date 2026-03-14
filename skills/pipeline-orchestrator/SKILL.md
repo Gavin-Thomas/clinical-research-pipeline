@@ -281,6 +281,13 @@ PROSPERO tip: If registering, complete the PROSPERO submission now (see
   03_inclusion_exclusion/prospero_protocol.md if generated) before searching.
 ─────────────────────────────────────────────
 
+EXPECTED VOLUME: Based on the search yield estimate, you should expect
+  approximately [estimated_total from Stage 4] records across all databases.
+  This is [within the expected range / above typical / below typical] for a
+  [project_type]. After deduplication, the pipeline will screen records in
+  batches — no manual screening is needed.
+─────────────────────────────────────────────
+
 When done: "I've placed the search results in the abstracts folder — please continue"
 Include how many records each database returned (for PRISMA flow diagram).
 ```

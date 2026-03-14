@@ -203,15 +203,30 @@ Estimate total screening burden across all databases (not just PubMed):
    → Read `meta.count`
 3. Estimate total unique records: `estimated_total = pubmed_count + (openalex_count - pubmed_count) × 0.4`
    (The 0.4 factor accounts for ~60% overlap between PubMed and other databases — conservative estimate)
-4. Print estimate to user:
+4. Print estimate to user with project-type context:
    ```
    📊 Estimated screening volume:
      PubMed yield: [N]
      OpenAlex total: [N] (all databases/sources)
      Estimated unique records after deduplication: ~[N]
+     Expected range for [project_type]: [lower]–[upper] records
+     [ASSESSMENT: within expected range / below expected / above expected]
      Note: Actual count depends on database overlap. Ovid/Embase may add 20-40% unique records.
    ```
-5. If estimated_total > 500: warn the user that screening will be substantial and suggest they may want to narrow the strategy or plan for batched screening
+
+   Expected screening ranges by project type (post-deduplication):
+   - systematic_review / meta_analysis: 200–2,000 (normal for comprehensive search)
+   - scoping_review: 500–5,000 (broad scope expected)
+   - rapid_review: 50–500
+   - qualitative_synthesis: 100–1,000
+   - diagnostic_test_accuracy: 100–1,000
+
+5. Assessment logic:
+   - If estimated_total is within the expected range: "✅ Screening volume looks appropriate for a [project_type]."
+   - If estimated_total < lower bound: "⚠️ Screening volume is below typical range — search may be too restrictive. Verify no key databases or synonyms are missing."
+   - If estimated_total > upper bound AND project_type is rapid_review: "⚠️ Volume exceeds rapid review capacity — consider adding study design filters."
+   - If estimated_total > upper bound AND project_type is systematic_review or meta_analysis: "ℹ️ Volume is above typical range but may be appropriate for a broad topic. Screening will proceed in batches. No narrowing recommended — comprehensive search is methodologically required for systematic reviews."
+   - If estimated_total > upper bound AND project_type is scoping_review: "ℹ️ Large volume is expected for scoping reviews. Pipeline will handle batched screening."
 
 ### Step 3: Write Output
 
