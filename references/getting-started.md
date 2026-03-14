@@ -137,7 +137,8 @@ The pipeline automatically queries the Unpaywall API for every included study wi
 | Is your question broad, conceptual, or mapping-focused (PCC framework)? | **Scoping review** (PRISMA-ScR; does not assess quality or synthesize quantitatively) |
 | Do you need a rapid answer (4–8 weeks) with limited resource? | **Rapid review** (streamlined SR; explicitly document methodological shortcuts) |
 | Are you collecting primary data (surveys, chart review, prospective cohort)? | **Original research** (STROBE for observational; CONSORT if RCT) |
-| Are you reporting a single patient or small case series with teaching value? | **Case report / case series** (CARE guideline) |
+| Are you reporting a single patient with teaching value? | **Case report** (CARE guideline; `case_report`) |
+| Are you reporting 3–20 patients sharing a diagnosis, exposure, or outcome? | **Case series** (CARE guideline + cross-case comparison; `case_series`) |
 | Is your question about patient experience, perspectives, or acceptability? | **Qualitative synthesis** (ENTREQ; synthesises qualitative primary research — thematic synthesis, meta-ethnography, framework synthesis) |
 | Is your question "how accurately does this test identify the condition?" (sensitivity, specificity, AUC)? | **Diagnostic test accuracy review** (STARD; QUADAS-2 appraisal; bivariate/HSROC synthesis; SROC curves) |
 

@@ -54,7 +54,9 @@ Collect project parameters efficiently. If the user has already provided their P
 
 Required parameters:
 1. **Project name** (will become the directory name)
-2. **Project type** (systematic_review, scoping_review, rapid_review, original_research, case_report, meta_analysis, qualitative_synthesis, diagnostic_test_accuracy)
+2. **Project type** (systematic_review, scoping_review, rapid_review, original_research, case_report, case_series, meta_analysis, qualitative_synthesis, diagnostic_test_accuracy)
+   - `case_report`: Single patient case with teaching value. Uses CARE guidelines.
+   - `case_series`: Multiple patients (typically 3–20) sharing a common exposure, diagnosis, or outcome. Uses CARE guidelines with aggregate summary. Treated as a variant of `case_report` with additional cross-case comparison. If the user says "case series", set `project_type: case_series`.
    - `qualitative_synthesis`: Systematic synthesis of qualitative research — thematic synthesis, meta-ethnography, framework synthesis, meta-aggregation. Use when the question concerns patient experience, perspectives, or acceptability. Uses PICo framework and ENTREQ reporting.
    - `diagnostic_test_accuracy`: Systematic review of how accurately an index test identifies a condition compared to a reference standard. Use when the primary outcome is sensitivity, specificity, or AUC — not treatment effect. Uses PICOS framing, QUADAS-2 appraisal, bivariate/HSROC synthesis, and STARD 2015 reporting.
 3. **PICO/PEO/PCC/PICo/PICOS components** (P, I/E, C, O; or for `diagnostic_test_accuracy`: P=suspected patients, I=index test, C=reference standard, O=diagnostic accuracy; or for `qualitative_synthesis`: P, phenomenon of Interest, Context) — or research topic if pre-PICO
@@ -111,7 +113,8 @@ databases:
   - [user input list]
 
 review_config:
-  reporting_standard: [auto-select: systematic_review→PRISMA, scoping_review→PRISMA-ScR, rapid_review→PRISMA, original_research→STROBE, case_report→CARE, meta_analysis→PRISMA, qualitative_synthesis→ENTREQ, diagnostic_test_accuracy→STARD]
+  reporting_standard: [auto-select: systematic_review→PRISMA, scoping_review→PRISMA-ScR, rapid_review→PRISMA, original_research→STROBE, case_report→CARE, case_series→CARE, meta_analysis→PRISMA, qualitative_synthesis→ENTREQ, diagnostic_test_accuracy→STARD]
+  n_cases: [case_series only: number of patients in the series — ask user; omit for other types]
   meta_analysis: [true if meta_analysis type OR if user requested pooling, false otherwise — always false for qualitative_synthesis and diagnostic_test_accuracy]
   network_meta_analysis: [true/false — always false for qualitative_synthesis and diagnostic_test_accuracy]
   diagnostic_model: [diagnostic_test_accuracy only: bivariate | hsroc — default bivariate; set hsroc if significant threshold effect detected; omit for other project types]
@@ -243,14 +246,14 @@ Execute in order, adapting for project type per `references/project-types.md`:
 - Skill: `skills/inclusion-exclusion/SKILL.md`
 - Prerequisite: `02_research_question/research_question.md`
 - Output: `03_inclusion_exclusion/criteria.md` (or `study_protocol.md` for original research)
-- **Skip for:** case_report
+- **Skip for:** case_report, case_series
 
 ### Stage 4: Database Search Build
 - Skill: `skills/database-search-build/SKILL.md`
 - Prerequisite: `03_inclusion_exclusion/criteria.md`
 - Output: `04_database_search/search_strategy.md` (or `data_collection_instruments.md` for original_research)
 - **MANUAL HANDOFF after this stage**
-- **Skip for:** case_report
+- **Skip for:** case_report, case_series
 - **Modified for:** original_research (builds data collection instruments, not search strategies)
 
 ### Manual Handoff 1
@@ -298,7 +301,7 @@ Include how many records each database returned (for PRISMA flow diagram).
 - Prerequisite: Files in `04_database_search/abstracts/`
 - Output: `05_screening/screened_results.csv`
 - **MANUAL HANDOFF after this stage**
-- **Skip for:** case_report
+- **Skip for:** case_report, case_series
 - **Modified for:** original_research (data cleaning, not abstract screening)
 
 ### Manual Handoff 2

@@ -80,7 +80,11 @@ During Step 5 (Statistician synthesis), if studies report contradictory findings
 
 If more than 10 papers to extract, batch at 10 per invocation. Track in `06_data_extraction/extraction_progress.yaml`.
 
-## Process — Review Types (systematic_review, scoping_review, meta_analysis)
+## Process — scoping_review
+
+Read `skills/data-extraction/section-scoping-review.md` and follow it exactly.
+
+## Process — Review Types (systematic_review, meta_analysis)
 
 ### Step 1: Dispatch Statistician for Template Design
 
@@ -365,9 +369,15 @@ Set `stages.data_extraction: completed`.
 
 ## Process — case_report
 
-**PI + Manuscript Writer agents** structure the case presentation:
+Read `skills/data-extraction/section-case-report.md` and follow it exactly.
 
-Dispatch PI agent to review clinical materials and identify key clinical features, timeline, and teaching points. Then dispatch Manuscript Writer to structure per CARE guidelines. Write to `06_data_extraction/case_presentation.md`.
+## Process — case_series
+
+Read `skills/data-extraction/section-case-report.md` and follow it exactly. The section-case-report.md file handles both single case reports and case series — it detects `project_type: case_series` from project.yaml and adds cross-case comparison steps.
+
+## Process — scoping_review
+
+Read `skills/data-extraction/section-scoping-review.md` and follow it exactly. Scoping reviews use data charting (thematic categorization), not standard data extraction for pooling.
 
 ## Process — rapid_review
 

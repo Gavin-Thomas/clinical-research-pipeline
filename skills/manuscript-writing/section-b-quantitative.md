@@ -18,6 +18,111 @@ Extract and note:
 
 If WebFetch fails, ask the user to paste the guidelines.
 
+### Step 1b: PRISMA Flow Diagram Generation
+
+**Skip conditions:**
+- Skip entirely for `case_report` (no PRISMA flow needed)
+- Skip entirely for `original_research` (uses CONSORT/STROBE flow instead)
+- For `diagnostic_test_accuracy`: generate a **STARD flow diagram** instead of PRISMA (adapt box labels below to STARD stages: enrollment → index test → reference standard → analysis)
+- For `qualitative_synthesis`: generate PRISMA but use qualitative-specific labels (e.g., "Studies included in qualitative synthesis" instead of "Studies included in quantitative synthesis (meta-analysis)")
+
+#### 1b.1: Collect PRISMA Flow Numbers
+
+Read prior stage outputs and extract the following counts:
+
+| PRISMA Box | Source File | How to Extract |
+|---|---|---|
+| Records identified (total, broken down by database) | `05_screening/deduplication_report.md` | Read the pre-deduplication total and per-database counts |
+| Duplicates removed | `05_screening/deduplication_report.md` | Read the duplicates-removed count |
+| Records screened | `05_screening/deduplication_report.md` | Post-dedup count (= total identified − duplicates removed) |
+| Records excluded at screening | `05_screening/screened_results.csv` | Count rows where the decision column = "EXCLUDE" |
+| Reports sought for retrieval | `05_screening/screened_results.csv` | Count rows where the decision column = "INCLUDE" |
+| Reports not retrieved | `06_data_extraction/missing_full_texts.md` | If file exists, count listed entries; else 0 |
+| Reports assessed for eligibility (full-text) | `06_data_extraction/full_texts/` | Count PDF files in this directory |
+| Reports excluded at full-text, with reasons | `06_data_extraction/extracted_data.csv` | Count rows where data indicates "Full text unavailable", "Excluded at full text", or similar; group by exclusion reason |
+| Studies included in review | `06_data_extraction/extracted_data.csv` | Count rows with actual extracted data present |
+| Studies included in quantitative synthesis (meta-analysis) | `06_data_extraction/extracted_data.csv` + `project.yaml` | Same count as above if `review_config.meta_analysis` is `true` in project.yaml; else "N/A" |
+
+Store all numbers in a dictionary/object for use below.
+
+#### 1b.2: Generate PRISMA 2020 Flow Diagram
+
+Produce two outputs:
+
+**(a) Structured markdown table** (for inline manuscript use):
+
+```markdown
+# PRISMA 2020 Flow Diagram Data
+
+## Identification
+| Source | Records |
+|---|---|
+| Database 1 (name) | n |
+| Database 2 (name) | n |
+| ... | ... |
+| **Total identified** | **N** |
+| Duplicates removed | n |
+
+## Screening
+| Stage | Count |
+|---|---|
+| Records screened | N |
+| Records excluded | n |
+
+## Retrieval
+| Stage | Count |
+|---|---|
+| Reports sought for retrieval | N |
+| Reports not retrieved | n |
+
+## Eligibility
+| Stage | Count |
+|---|---|
+| Reports assessed for eligibility | N |
+| Reports excluded (with reasons below) | n |
+
+### Exclusion Reasons at Full-Text
+| Reason | Count |
+|---|---|
+| [reason 1] | n |
+| [reason 2] | n |
+
+## Included
+| Stage | Count |
+|---|---|
+| Studies included in review | N |
+| Studies included in quantitative synthesis (meta-analysis) | N or N/A |
+```
+
+**(b) Executable Python script** (`prisma_flow.py`) using matplotlib to generate a PRISMA 2020 flow diagram PNG:
+
+The script should:
+- Create a figure with boxes and arrows following the PRISMA 2020 template layout
+- Left column: "Identification" → "Screening" → "Included" (database/register sources)
+- Right column: "Other sources" (registers, citation searching, etc.) — populate if data available, else omit
+- Each box contains the stage label and the count
+- Arrows connect boxes vertically (flow down) and horizontally (exclusions branch right)
+- Use a clean, publication-quality style: white boxes with thin black borders, black arrows, readable font (Arial/Helvetica, 9–10 pt)
+- Save the output to `07_manuscript/figures/prisma_flow.png` at 300 DPI
+- Accept an optional `--output` argument to override the save path
+- For `diagnostic_test_accuracy` projects: adapt to STARD flow layout
+- For `qualitative_synthesis` projects: relabel the final box to "Studies included in qualitative synthesis"
+
+#### 1b.3: Write Outputs
+
+- Write the markdown table to `07_manuscript/prisma_flow_data.md`
+- Write the Python script to `07_manuscript/prisma_flow.py`
+- Create the `07_manuscript/figures/` directory if it does not exist
+- Execute the Python script to generate `07_manuscript/figures/prisma_flow.png`
+
+If matplotlib is not available in the environment, write the script but skip execution and note in the output that the user should run `python 07_manuscript/prisma_flow.py` manually.
+
+#### 1b.4: Pass PRISMA Data Forward
+
+Store the PRISMA flow data (the collected numbers dictionary and the path to `prisma_flow_data.md`) so that it is available to the Writer agents in Step 2. Writers should reference these numbers directly rather than re-deriving them from source files.
+
+---
+
 ### Step 2: Dispatch Manuscript Writer A, Writer B, and Statistician in Parallel
 
 **Writer A agent prompt:**
@@ -38,6 +143,7 @@ SOURCE MATERIALS:
 - Criteria: [Read and insert 03_inclusion_exclusion/criteria.md]
 - Search strategy: [Read and insert 04_database_search/search_strategy.md]
 - Screening results summary: [Read and insert first 20 lines of 05_screening/screened_results.csv]
+- PRISMA flow data: [Read and insert 07_manuscript/prisma_flow_data.md from Step 1b]
 
 INTRODUCTION should:
 - Establish the clinical context and significance
@@ -51,7 +157,7 @@ METHODS should:
 - Describe screening process and criteria
 - Describe data extraction process
 - Describe synthesis/analysis approach
-- Include PRISMA flow diagram data (numbers at each stage)
+- Include PRISMA flow diagram data from Step 1b (reference exact numbers from prisma_flow_data.md rather than re-deriving)
 
 Follow the journal's word limits and section structure.
 
@@ -77,9 +183,10 @@ SOURCE MATERIALS:
 - Extracted data: [Read and insert 06_data_extraction/extracted_data.csv]
 - Synthesis report: [Read and insert 06_data_extraction/synthesis_report.md]
 - Meta-analysis results (if exists): [Read and insert 06_data_extraction/meta_analysis_results.md]
+- PRISMA flow data: [Read and insert 07_manuscript/prisma_flow_data.md from Step 1b]
 
 RESULTS should:
-- Present search/screening flow (PRISMA numbers)
+- Present search/screening flow using exact PRISMA numbers from Step 1b (reference prisma_flow_data.md)
 - Study characteristics summary (Table 1)
 - Main findings organized by outcome
 - Include all tables and figures referenced in synthesis report
@@ -360,6 +467,9 @@ Print:
 📄 Files:
 - Manuscript: 07_manuscript/manuscript.md
 - References: 07_manuscript/references.bib
+- PRISMA flow data: 07_manuscript/prisma_flow_data.md
+- PRISMA flow script: 07_manuscript/prisma_flow.py
+- PRISMA flow figure: 07_manuscript/figures/prisma_flow.png
 
 📋 NEXT STEPS:
 1. Review the manuscript for accuracy and clinical nuance

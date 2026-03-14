@@ -31,7 +31,7 @@ Broader in scope than a systematic review. Aims to map the available evidence ra
 - **Stage 3 (Inclusion/Exclusion):** Broader inclusion criteria. Eligibility is more expansive to capture the breadth of available literature.
 - **Stage 4 (Database Search Build):** Standard critical appraisal (optional per scoping review methodology; follows project setting).
 - **Stage 5 (Abstract Screening):** Charting process replaces standard extraction. Classification decisions use **MAP / OUT_OF_SCOPE / UNCERTAIN** instead of INCLUDE / EXCLUDE. Data is charted into thematic categories rather than extracted for pooling.
-- **Stage 6 (Data Extraction & Synthesis):** **Narrative synthesis only.** No meta-analysis is performed regardless of project setting. Results are presented as thematic maps, frequency counts, and descriptive summaries.
+- **Stage 6 (Data Extraction & Synthesis):** **Data charting replaces standard data extraction.** Uses `section-scoping-review.md` process: Methodologist designs a charting framework based on PCC components, 3 Data Extractors chart papers into thematic categories, Methodologist produces an evidence gap map and narrative thematic summary. **No meta-analysis.** No pooled estimates, forest plots, or heterogeneity statistics. Output: `charted_data.csv` + `synthesis_report.md`.
 - **Stage 7 (Manuscript Writing):** **PRISMA-ScR** (PRISMA Extension for Scoping Reviews) reporting guideline.
 
 ---
@@ -81,6 +81,35 @@ Clinical case presentation. The pipeline is significantly abbreviated, focusing 
 - **Manual Handoff:** Single manual handoff. Clinical materials (patient records, imaging, lab results, clinical photographs) are placed in `full_texts/`.
 - **Stage 6 (Case Structuring):** **PI and Manuscript Writer** collaboratively structure the case presentation. Organizes clinical timeline, diagnostic workup, management decisions, and outcomes into a coherent narrative.
 - **Stage 7 (Manuscript Writing):** **CARE guidelines** (CAse REport) reporting guideline.
+
+---
+
+## 5b. case_series
+
+Multiple patients (typically 3–20) sharing a common exposure, diagnosis, treatment, or outcome. A case series extends a single case report into a small cohort analysis. Uses CARE guidelines with modifications for aggregate reporting.
+
+### Differences from case_report
+
+| Aspect | case_report | case_series |
+|--------|------------|-------------|
+| Patients | 1 | 3–20 (set via `n_cases` in project.yaml) |
+| Stage 6 output | Single case presentation | Individual case summaries + cross-case comparison table |
+| Manuscript structure | Single patient narrative | Individual cases → aggregate summary → cross-case analysis |
+| Statistics | None | Descriptive statistics (median, range, frequencies) across cases |
+| CARE compliance | Per-patient | Per-patient + aggregate table |
+
+### Stage-by-Stage Adaptations
+
+- **Stage 1 (Literature Search):** Standard. Identifies significance of the case series topic.
+- **Stage 2 (Research Question):** PI frames the series objectives: what common thread links these cases? What pattern or clinical lesson emerges?
+- **Stages 3–5:** **Skipped entirely** (same as case_report).
+- **Manual Handoff:** Clinical materials for ALL patients placed in `06_data_extraction/full_texts/`. Naming: `Patient1_[keyword].pdf`, `Patient2_[keyword].pdf`, etc.
+- **Stage 6 (Case Structuring):** PI extracts each case individually using the case_report process, THEN produces a cross-case comparison:
+  - Summary table: rows = patients, columns = demographics, diagnosis, treatment, outcome
+  - Common themes across cases
+  - Descriptive statistics: median age, sex distribution, outcome frequencies
+  - Distinguishing features between cases
+- **Stage 7 (Manuscript Writing):** **CARE guidelines** with aggregate reporting. Manuscript includes individual case summaries (abbreviated) + detailed cross-case analysis + summary table.
 
 ---
 
