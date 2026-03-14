@@ -1,7 +1,7 @@
 {
   "name": "clinical-research-pipeline",
   "version": "1.2.0",
-  "description": "End-to-end academic research pipeline using AI agent teams. Supports systematic reviews, scoping reviews, rapid reviews, original research, case reports, meta-analyses, qualitative syntheses, and diagnostic test accuracy reviews. Includes Programmer agent for code validation, Proofreader agent for independent linguistic QA, API integrations (PubMed E-utilities, Semantic Scholar, OpenAlex, Unpaywall), and autonomous refinement loops for search yield and manuscript quality.",
+  "description": "End-to-end academic research pipeline using AI agent teams. Supports systematic reviews, scoping reviews, rapid reviews, original research, case reports, case series, meta-analyses, qualitative syntheses, and diagnostic test accuracy reviews. Includes Programmer agent for code validation, Proofreader agent for independent linguistic QA, API integrations (PubMed E-utilities, Semantic Scholar, OpenAlex, Unpaywall), and autonomous refinement loops for search yield and manuscript quality.",
   "author": {
     "name": "Gavin"
   }
