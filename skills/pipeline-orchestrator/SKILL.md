@@ -322,6 +322,12 @@ REMAINING PAYWALLED PDFs ([n_total - n_oa] articles):
 NAMING: [FirstAuthor]_[Year]_[keyword].pdf (e.g., Smith_2022_dupilumab_AD.pdf)
 DESTINATION: [project_dir]/06_data_extraction/full_texts/
 ─────────────────────────────────────────────
+⚠️ PDF FORMAT: Ensure PDFs contain selectable text (not scanned images).
+  The pipeline reads PDF text directly — image-only scans cannot be processed.
+  If a PDF is a scanned image: run OCR first (Adobe Acrobat → Recognize Text,
+  or free tool: ocrmypdf input.pdf output.pdf). The pipeline will pre-check
+  all PDFs and flag any that are unreadable before starting extraction.
+─────────────────────────────────────────────
 UNAVAILABLE ARTICLES:
   Report the PMID/DOI of any articles you cannot retrieve. These will be
   documented as "full text not retrieved" in the PRISMA flow diagram — this

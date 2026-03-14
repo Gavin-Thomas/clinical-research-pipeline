@@ -33,9 +33,37 @@ Before Step 2, compare PDFs in `06_data_extraction/full_texts/` against IDs in `
 - Print a warning listing missing papers and count; continue extraction with available PDFs
 - Do NOT abort the stage due to missing texts
 
+### PDF Readability Pre-Check
+
+Before starting extraction, quickly test-read page 1 of each PDF to identify unreadable files upfront:
+
+1. For each PDF in `06_data_extraction/full_texts/`:
+   - Read page 1 using: `Read(file_path, pages="1")`
+   - If the returned text is empty, very short (<50 characters), or garbled: flag as likely scanned/image-only
+2. Write a readability report to `06_data_extraction/pdf_readability.md`:
+   ```
+   | Filename | Pages | Readable | Issue |
+   |----------|-------|----------|-------|
+   | Smith_2022_dupilumab.pdf | 12 | Yes | — |
+   | Chen_2019_biologics.pdf | 8 | No | Scanned image — no text layer |
+   ```
+3. If any PDFs fail the pre-check, print immediately:
+   ```
+   ⚠️ [N] PDF(s) appear to be scanned images without a text layer:
+     - [filename] — scanned/image-only (no extractable text)
+
+   These cannot be read by the pipeline. Options:
+   1. Run OCR (Adobe Acrobat → Recognize Text, or free: ocrmypdf)
+   2. Replace with a text-based version from the publisher
+   3. Extract data manually and add to extracted_data.csv
+
+   Remaining [N] readable PDFs will be processed now.
+   ```
+4. Continue extraction with readable PDFs only — do not wait for user to fix unreadable ones
+
 ### Unreadable or Corrupted PDFs
 
-If the Read tool fails on a PDF (encrypted, scanned without OCR, or corrupted):
+If the Read tool fails on a PDF during extraction (encrypted, corrupted, or missed by pre-check):
 - Add the paper to `extraction_progress.yaml` under `failed_reads: [filename, reason]`
 - Set extracted row values to `"PDF unreadable — [reason]"`
 - Continue with remaining papers; report failed reads in the stage summary
