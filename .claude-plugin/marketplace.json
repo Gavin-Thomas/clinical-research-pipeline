@@ -1,0 +1,17 @@
+{
+  "name": "clinical-research-plugins",
+  "owner": {
+    "name": "Gavin"
+  },
+  "plugins": [
+    {
+      "name": "clinical-research-pipeline",
+      "source": ".",
+      "description": "End-to-end academic research pipeline using AI agent teams. Supports systematic reviews, scoping reviews, rapid reviews, original research, case reports, meta-analyses, qualitative syntheses, and diagnostic test accuracy reviews.",
+      "version": "1.0.48",
+      "author": {
+        "name": "Gavin"
+      }
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "name": "clinical-research-pipeline",
+  "version": "1.0.48",
+  "description": "End-to-end academic research pipeline using AI agent teams. Supports systematic reviews, scoping reviews, rapid reviews, original research, case reports, meta-analyses, qualitative syntheses, and diagnostic test accuracy reviews. Provides 7 pipeline stage skills plus an orchestrator that coordinates the full workflow from literature search to manuscript writing.",
+  "author": {
+    "name": "Gavin"
+  }
+}

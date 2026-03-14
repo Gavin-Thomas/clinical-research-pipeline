@@ -1,0 +1,306 @@
+# Section B: Quantitative / Mixed Methods Manuscript
+
+_For all project types except `qualitative_synthesis`, `case_report`, and `diagnostic_test_accuracy`._
+
+### Step 1: Fetch Journal Guidelines
+
+Use WebFetch to retrieve the target journal's author guidelines from `journal_guidelines_url` in `project.yaml`.
+
+Extract and note:
+- Word/character limits (abstract, full text)
+- Required sections and order
+- Reference formatting style (Vancouver, APA, etc.)
+- Table/figure formatting requirements
+- Required supplementary materials
+- Reporting checklist requirements (PRISMA, etc.)
+- Structured abstract format (if required)
+- Conflict of interest / funding statement requirements
+
+If WebFetch fails, ask the user to paste the guidelines.
+
+### Step 2: Dispatch Manuscript Writer A, Writer B, and Statistician in Parallel
+
+**Writer A agent prompt:**
+
+```
+[Insert Manuscript Writer system prompt from agent-roles.md]
+
+TASK: Draft the INTRODUCTION and METHODS sections.
+
+TARGET JOURNAL: [from project.yaml]
+JOURNAL GUIDELINES: [Insert fetched guidelines summary]
+PROJECT TYPE: [from project.yaml]
+REPORTING STANDARD: [from project.yaml review_config.reporting_standard]
+
+SOURCE MATERIALS:
+- Landscape report: [Read and insert 01_literature_search/landscape_report.md]
+- Research question: [Read and insert 02_research_question/research_question.md]
+- Criteria: [Read and insert 03_inclusion_exclusion/criteria.md]
+- Search strategy: [Read and insert 04_database_search/search_strategy.md]
+- Screening results summary: [Read and insert first 20 lines of 05_screening/screened_results.csv]
+
+INTRODUCTION should:
+- Establish the clinical context and significance
+- Summarize the current state of knowledge (from landscape report)
+- Identify the gap this study addresses
+- State the research question and objectives
+
+METHODS should:
+- Follow the reporting standard checklist exactly
+- Describe search strategy, databases, date range
+- Describe screening process and criteria
+- Describe data extraction process
+- Describe synthesis/analysis approach
+- Include PRISMA flow diagram data (numbers at each stage)
+
+Follow the journal's word limits and section structure.
+
+OUTPUT: Introduction and Methods sections in markdown.
+```
+
+**Writer B agent prompt:**
+
+```
+[Insert Manuscript Writer system prompt from agent-roles.md]
+
+TASK: Draft the RESULTS and DISCUSSION sections.
+
+TARGET JOURNAL: [from project.yaml]
+JOURNAL GUIDELINES: [Insert fetched guidelines summary]
+PROJECT TYPE: [from project.yaml]
+REPORTING STANDARD: [from project.yaml review_config.reporting_standard]
+
+SOURCE MATERIALS:
+- Research question: [Read and insert 02_research_question/research_question.md]
+- Landscape report (for Discussion — existing literature comparison): [Read and insert 01_literature_search/landscape_report.md]
+- Screening results: [Read and insert 05_screening/screened_results.csv]
+- Extracted data: [Read and insert 06_data_extraction/extracted_data.csv]
+- Synthesis report: [Read and insert 06_data_extraction/synthesis_report.md]
+- Meta-analysis results (if exists): [Read and insert 06_data_extraction/meta_analysis_results.md]
+
+RESULTS should:
+- Present search/screening flow (PRISMA numbers)
+- Study characteristics summary (Table 1)
+- Main findings organized by outcome
+- Include all tables and figures referenced in synthesis report
+- Meta-analysis results if applicable (forest plots, heterogeneity)
+
+DISCUSSION should:
+- Summarize key findings in context of the research question
+- Compare with existing literature (cite specific reviews and studies from landscape_report.md)
+- Discuss strengths and limitations
+- Clinical implications
+- Future research directions
+- Conclusion
+
+Follow the journal's word limits and section structure.
+
+OUTPUT: Results and Discussion sections in markdown.
+```
+
+**Statistician agent prompt:**
+
+```
+[Insert Statistician system prompt from agent-roles.md]
+
+TASK: Prepare all tables, figures, and statistical reporting text for the manuscript.
+
+TARGET JOURNAL: [from project.yaml]
+JOURNAL GUIDELINES: [Insert fetched guidelines — table/figure formatting requirements]
+
+SOURCE MATERIALS:
+- Extracted data: [Read and insert 06_data_extraction/extracted_data.csv]
+- Synthesis report: [Read and insert 06_data_extraction/synthesis_report.md]
+- Meta-analysis results (if exists): [Read and insert 06_data_extraction/meta_analysis_results.md]
+- NMA results (if `review_config.network_meta_analysis` is `true` in project.yaml): [Read and insert 06_data_extraction/nma_results.md]
+
+Prepare:
+1. Table 1: Study Characteristics (formatted per journal requirements)
+2. Table 2: Summary of Findings / GRADE table (formatted per journal requirements)
+3. Risk of Bias table/figure
+4. PRISMA flow diagram (as structured text)
+5. Forest plots (if meta-analysis — as markdown tables referencing outputs in `analysis_scripts/outputs/`)
+6. If `network_meta_analysis` is true: league table (all pairwise NMA estimates with 95% CI/CrI, direct vs. indirect annotated); SUCRA/P-score ranking table; network geometry figure legend; GRADE-NMA 7-domain certainty table
+7. Any additional tables/figures needed
+8. Statistical reporting text snippets that Writers can embed
+
+Format all tables per the journal's specific requirements.
+
+OUTPUT: All tables, figures, and statistical text in markdown.
+```
+
+### Step 3: Merge Step
+
+Dispatch Writer A as a merge agent:
+
+**Merge agent prompt:**
+
+```
+[Insert Manuscript Writer system prompt from agent-roles.md]
+
+TASK: Merge the following manuscript sections into one cohesive document.
+
+INTRODUCTION + METHODS:
+[Insert Writer A's output]
+
+RESULTS + DISCUSSION:
+[Insert Writer B's output]
+
+TABLES + FIGURES + STATISTICAL TEXT:
+[Insert Statistician's output]
+
+JOURNAL GUIDELINES: [Insert fetched guidelines summary]
+
+Merge into a single manuscript with:
+1. Title page (title, authors placeholder, affiliations placeholder, corresponding author)
+2. Structured abstract (per journal format)
+3. Keywords
+4. Introduction
+5. Methods
+6. Results
+7. Discussion
+8. Conclusion
+9. Declarations (funding, conflicts, ethics — placeholder text)
+10. References
+11. Tables
+12. Figure legends
+
+Ensure:
+- Consistent voice and tense throughout
+- No redundancy between sections
+- Tables/figures are referenced in text
+- Word counts are within journal limits
+- Reporting checklist items are addressed
+
+**SELF-CHECK (required before writing output to disk):**
+
+Before finalizing the manuscript, perform a self-proofreading pass. Check each item and note any issues found (correct them inline before outputting):
+
+Grammar & Writing Quality:
+- [ ] No sentence fragments, run-ons, or grammatical errors
+- [ ] Consistent tense: past tense in Methods and Results; present tense for established facts and Discussion
+- [ ] No first-person voice unless journal guidelines explicitly permit it
+- [ ] All abbreviations defined at first use and consistent throughout
+- [ ] Numbers: spelled out below 10, numerals for 10 and above, always numerals with units
+- [ ] SI units used throughout unless journal specifies otherwise
+
+Structural Completeness:
+- [ ] All required sections present and in the correct order per journal guidelines
+- [ ] Abstract is within word limit and in the correct format (structured vs. unstructured)
+- [ ] Main text is within word limit
+- [ ] No section is missing its required subsections per the applicable reporting guideline
+
+Citation & Reference Integrity:
+- [ ] Every in-text citation has a corresponding reference in the reference list
+- [ ] Every reference in the reference list is cited at least once in text
+- [ ] No `[CITATION NEEDED]` flags remain unresolved
+- [ ] References are formatted correctly per the journal's citation style (Vancouver, APA, etc.)
+- [ ] Reference list is numbered sequentially in order of citation appearance (if Vancouver)
+
+Statistical Reporting:
+- [ ] All effect estimates reported with 95% CI and p-value
+- [ ] Heterogeneity metrics (I², Q, tau², prediction interval) reported for all meta-analytic results
+- [ ] No p-values reported without effect size context
+- [ ] Statistically significant ≠ clinically significant — text does not conflate these
+- [ ] GRADE certainty ratings included in the Results or Discussion if applicable
+- [ ] If `network_meta_analysis` is true: league table with all pairwise NMA estimates present; SUCRA/P-score rankings reported; consistency test results (global + node-splitting) in Methods/Results; GRADE-NMA 7-domain table (including Indirectness and Incoherence) present; network geometry and NMA forest plot figures referenced by number
+
+Tables & Figures:
+- [ ] Every table and figure is referenced in the main text by number (Table 1, Figure 1, etc.)
+- [ ] Table and figure numbers are sequential and consistent with the reference list order
+- [ ] All table column headers are clear and include units where applicable
+- [ ] Figure legends are self-contained (reader can understand the figure without reading main text)
+
+Reporting Guideline Compliance:
+- [ ] PRISMA 2020 flow diagram data is present in Methods/Results (if systematic review)
+- [ ] PRISMA checklist items are all addressed (if systematic review or meta-analysis)
+- [ ] PRISMA-ScR checklist items addressed (if scoping review)
+- [ ] STROBE/CONSORT/CARE items addressed (for original research/case report)
+- [ ] Study registration details (PROSPERO/ClinicalTrials.gov) reported in Methods if applicable
+
+If any self-check item fails, correct it before producing the final output.
+
+OUTPUT: Complete manuscript in markdown + references in BibTeX format.
+```
+
+### Step 4: Write Output
+
+Write manuscript to `07_manuscript/manuscript.md`.
+Write references to `07_manuscript/references.bib`.
+
+### Step 5: Full Review
+
+Dispatch Full Review per `references/reviewer-protocol.md`. Initialize `review_iteration = 0`.
+
+**Review criteria for this stage (provide these to each reviewer in the dispatch prompt):**
+
+Journal Compliance:
+- Does the manuscript structure match the target journal's required section order?
+- Is the abstract within word limits and in the correct format (structured/unstructured per journal)?
+- Is the main text within the journal's word limit?
+- Are references formatted correctly per the journal's citation style?
+- Are the number of tables and figures within the journal's limits?
+
+Reporting Guideline Compliance:
+- Is every applicable PRISMA 2020 item addressed (for systematic reviews and meta-analyses)?
+- Is every applicable PRISMA-ScR item addressed (for scoping reviews)?
+- Is every applicable STROBE/CONSORT/CARE item addressed (for original research/case reports)?
+- Is the study registration cited in Methods (if applicable)?
+- Is the PRISMA flow diagram data present (search results, screening, included studies at each stage)?
+
+Writing & Internal Consistency:
+- Is the tense consistent (past for Methods/Results, present for Discussion of established facts)?
+- Are all abbreviations defined at first use?
+- Do all in-text citations appear in the reference list, and vice versa?
+- Are any `[CITATION NEEDED]` flags left unresolved?
+- Is the Discussion grounded in the Results — no claims made that are not supported by the extracted data?
+
+Statistical Reporting:
+- Are all effect estimates reported with 95% CI and p-value?
+- Are heterogeneity metrics (I², Q, tau², prediction interval) reported for all pooled analyses?
+- Is statistical significance correctly distinguished from clinical significance?
+- Are GRADE certainty ratings present (if applicable)?
+
+Tables & Figures:
+- Are all tables and figures referenced by number in the main text?
+- Is table and figure numbering sequential and consistent?
+- Are figure legends self-contained?
+
+**Review iteration loop:**
+
+On **APPROVE** (majority): proceed to Step 6.
+
+On **REVISE** (any reviewer):
+- Build a REVISION REQUIRED table consolidating all reviewer findings:
+  | Reviewer | Category | Finding | Location in Manuscript | Required Action |
+  |----------|----------|---------|------------------------|----------------|
+- Re-dispatch the merge agent with: (1) current `manuscript.md`, (2) the REVISION REQUIRED table, (3) instruction to address each finding in turn and annotate which were addressed
+- Update `07_manuscript/manuscript.md` with revised content
+- Increment `review_iteration += 1`
+- Re-dispatch Full Review with revision history prepended to reviewer context
+
+On **REJECT** (any reviewer) or `review_iteration ≥ 2` without APPROVE:
+- Trigger full escalation per `references/reviewer-protocol.md`
+- Print escalation banner with: all reviewer findings across iterations, revision notes, and specific unresolved issues
+- Pause pipeline and present to user for resolution before proceeding to Step 6
+
+### Step 6: Update project.yaml
+
+Set `stages.manuscript_writing: completed`.
+
+Print:
+
+```
+✅ Manuscript complete!
+
+📄 Files:
+- Manuscript: 07_manuscript/manuscript.md
+- References: 07_manuscript/references.bib
+
+📋 NEXT STEPS:
+1. Review the manuscript for accuracy and clinical nuance
+2. Add author names, affiliations, and contact details
+3. Complete declarations (funding, conflicts of interest, ethics approval)
+4. Convert to the journal's required submission format (Word/LaTeX)
+5. Submit!
+```
