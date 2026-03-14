@@ -24,7 +24,7 @@ Before dispatching any agents, perform these pre-flight checks. Stop immediately
 
 Read `project_type` from `project.yaml` first, then apply the project-type-specific checks below.
 
-For **`case_report`** projects, check:
+For **`case_report`** or **`case_series`** projects, check:
 - `06_data_extraction/case_presentation.md` — if missing → STOP: "Case presentation not found. Please complete Stage 6 (Data Extraction) for your case report before running manuscript writing. Stage 6 for case reports produces `06_data_extraction/case_presentation.md`."
 - Skip `screened_results.csv`, `extracted_data.csv`, and `synthesis_report.md` checks — these files are not produced for case reports.
 
@@ -41,7 +41,7 @@ For **all other project types** (systematic_review, scoping_review, rapid_review
 
 **Included study count**
 
-_Skip this check for `case_report` and `original_research` — it applies only to review types with a screening stage._
+_Skip this check for `case_report`, `case_series`, and `original_research` — it applies only to review types with a screening stage._
 
 Count rows where `final_decision = INCLUDE` in `screened_results.csv`. Call this `n_included`.
 
@@ -62,6 +62,7 @@ If `journal_guidelines_url` is blank, "TBD", or absent from project.yaml: note t
 > |---|---|
 > | `qualitative_synthesis` | Read `skills/manuscript-writing/section-a-qualitative.md` and follow it exactly |
 > | `case_report` | Read `skills/manuscript-writing/section-c-case-report.md` and follow it exactly |
+> | `case_series` | Read `skills/manuscript-writing/section-c-case-report.md` and follow it exactly |
 > | `diagnostic_test_accuracy` | Read `skills/manuscript-writing/section-d-dta.md` and follow it exactly |
 > | `original_research` | Read `skills/manuscript-writing/section-e-original-research.md` and follow it exactly |
 > | all others (systematic_review, scoping_review, rapid_review, meta_analysis) | Read `skills/manuscript-writing/section-b-quantitative.md` and follow it exactly |

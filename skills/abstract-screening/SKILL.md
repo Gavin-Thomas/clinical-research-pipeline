@@ -180,6 +180,7 @@ If the total number of abstracts exceeds the batch size:
 > | `rapid_review` | Read `skills/abstract-screening/section-rapid-review.md` and follow it exactly |
 > | `original_research` | Read `skills/abstract-screening/section-original-research.md` and follow it exactly |
 > | `case_report` | This stage is skipped — see Process — Case Report below |
+> | `case_series` | This stage is skipped — see Process — Case Report below |
 > | all others (systematic_review, scoping_review, meta_analysis) | Continue with Process — Review Types below |
 
 Read the appropriate sub-file now (if applicable), then execute its steps in full.
@@ -372,11 +373,11 @@ Output CSV columns: `id, title, decision, category, criterion, reasoning, confid
 
 ---
 
-## Process — case_report
+## Process — case_report / case_series
 
-This stage is skipped for case reports. The skill should detect `project_type: case_report` and print:
+This stage is skipped for case reports and case series. The skill should detect `project_type: case_report` or `project_type: case_series` and print:
 
 ```
-ℹ️ Stage 5 (Abstract Screening) is skipped for case reports.
+ℹ️ Stage 5 (Abstract Screening) is skipped for case reports and case series.
 Place your clinical materials in 06_data_extraction/full_texts/ and run /data-extraction.
 ```

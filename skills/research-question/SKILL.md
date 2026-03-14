@@ -21,6 +21,7 @@ Formulate a novel, well-structured research question using AI agent teams.
 Read `project.yaml`. Route to the appropriate process based on `project_type`:
 
 - `case_report` → [Process — Case Report](#process--case-report)
+- `case_series` → [Process — Case Report](#process--case-report)
 - `rapid_review` → [Process — Rapid Review](#process--rapid-review)
 - `original_research` → [Process — Original Research](#process--original-research)
 - `qualitative_synthesis` → [Process — Qualitative Synthesis](#process--qualitative-synthesis)
@@ -204,7 +205,7 @@ Update `pico` block in `project.yaml` with the finalized PICO/PEO components fro
 
 ## Process — Case Report
 
-For case reports, there is no systematic research question. Instead, the PI frames the teaching objectives and clinical significance of the case.
+For case reports and case series, there is no systematic research question. Instead, the PI frames the teaching objectives and clinical significance of the case(s). This section handles both `case_report` and `case_series` — for case series, the PI should frame objectives around the collective pattern across cases.
 
 ### Step 1: Dispatch PI Agent
 

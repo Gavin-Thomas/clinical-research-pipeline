@@ -383,11 +383,11 @@ Read `skills/inclusion-exclusion/section-dta.md` and follow it exactly.
 
 ---
 
-## Process — Case Report
+## Process — Case Report / Case Series
 
-This stage is skipped for case reports. Print:
+This stage is skipped for case reports and case series. Detect `project_type: case_report` or `project_type: case_series` and print:
 
 ```
-Stage 3 (Inclusion/Exclusion Criteria) is skipped for case reports.
+Stage 3 (Inclusion/Exclusion Criteria) is skipped for case reports and case series.
 Run /database-search-build to continue, or skip to /data-extraction.
 ```
