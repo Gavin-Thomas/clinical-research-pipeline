@@ -130,11 +130,20 @@ WHILE iteration < 3:
      https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term={encoded_query}&retmax=0&retmode=json
      → Read esearchresult.count
 
-  3. EVALUATE:
+  3. EVALUATE using project-type-aware thresholds:
+
+     Target ranges (PubMed only — total across all databases will be higher):
+     - systematic_review / meta_analysis: 50–300
+     - scoping_review: 100–500 (broader scope expected)
+     - rapid_review: 30–150 (tighter is better)
+     - qualitative_synthesis: 30–200
+     - diagnostic_test_accuracy: 30–200
+
+     Verdict:
      - count == 0 → TOO RESTRICTIVE
-     - count 1–9 → NARROW (warn but may be acceptable for rare topics)
-     - count 10–500 → ACCEPTABLE → BREAK loop, proceed
-     - count > 500 → TOO BROAD
+     - count < lower_bound → NARROW (warn but may be acceptable for rare topics)
+     - count within target range → ACCEPTABLE → BREAK loop, proceed
+     - count > upper_bound → TOO BROAD
 
   4. ADJUST (only if not ACCEPTABLE):
      - TOO RESTRICTIVE: Remove the most restrictive concept block (usually the
@@ -143,7 +152,7 @@ WHILE iteration < 3:
      - TOO BROAD: Add a study design filter (e.g., clinical trial, randomized
        controlled trial). Narrow the population concept with more specific MeSH
        subheadings. Restrict date range.
-     - Log: "Iteration [N]: count=[count], action=[adjustment description]"
+     - Log: "Iteration [N]: count=[count], target=[lower–upper], action=[adjustment description]"
 
   5. INCREMENT iteration
 
@@ -164,6 +173,45 @@ Final PubMed yield estimate: **87 records**
 ```
 
 If the loop exhausts 3 iterations without reaching an acceptable range, proceed anyway but print a warning to the user with all iteration results so they can manually adjust.
+
+**Step 2b: Recall Validation (sensitivity check)**
+
+After the yield loop converges, verify that the strategy captures known relevant studies from Stage 1:
+
+1. Read `01_literature_search/landscape_report.md` — extract up to 5 PMIDs from the Preliminary Bibliography or Key Studies section
+2. For each PMID, test whether the final PubMed query retrieves it:
+   WebFetch: `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term={final_query}+AND+{PMID}[uid]&retmode=json`
+   → If `esearchresult.count` == "0", the strategy misses this known-relevant paper
+3. If ≥2 of the 5 landmark papers are missed: the strategy is too narrow despite acceptable count — log which papers were missed and which concept block likely excluded them, then broaden that block and re-test yield (counts as one additional iteration)
+4. Write recall check to the yield testing log:
+   ```
+   ## Recall Validation
+   | PMID | First Author | Found | Notes |
+   |------|-------------|-------|-------|
+   | 12345678 | Smith 2022 | Yes | — |
+   | 87654321 | Chen 2021 | No | Missing — no MeSH match for "biologic" synonym |
+   Recall: 4/5 landmark papers captured
+   ```
+
+**Step 2c: Cross-Database Volume Estimate**
+
+Estimate total screening burden across all databases (not just PubMed):
+
+1. Read `project.yaml` → `databases` list
+2. Use the OpenAlex API to estimate total volume across sources:
+   WebFetch: `https://api.openalex.org/works?filter=default.search:{topic_keywords},publication_year:{date_range}&per_page=1`
+   → Read `meta.count`
+3. Estimate total unique records: `estimated_total = pubmed_count + (openalex_count - pubmed_count) × 0.4`
+   (The 0.4 factor accounts for ~60% overlap between PubMed and other databases — conservative estimate)
+4. Print estimate to user:
+   ```
+   📊 Estimated screening volume:
+     PubMed yield: [N]
+     OpenAlex total: [N] (all databases/sources)
+     Estimated unique records after deduplication: ~[N]
+     Note: Actual count depends on database overlap. Ovid/Embase may add 20-40% unique records.
+   ```
+5. If estimated_total > 500: warn the user that screening will be substantial and suggest they may want to narrow the strategy or plan for batched screening
 
 ### Step 3: Write Output
 

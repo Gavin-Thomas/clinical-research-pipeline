@@ -71,6 +71,7 @@ After web searching, use WebFetch to query these APIs for structured data:
 1. WebFetch: `https://api.openalex.org/works?filter=default.search:{topic},publication_year:2020-2026&per_page=1`
    → Read `meta.count` for total works estimate
 2. Compare OpenAlex count vs. PubMed count — large discrepancy suggests relevant literature outside PubMed (conference papers, grey literature)
+3. Report the ratio: `openalex_count / pubmed_count`. If ratio > 3×, flag that significant literature exists outside PubMed and recommend additional databases. This ratio is used by Stage 4 to estimate total screening burden.
 
 IMPORTANT: If any API call fails (timeout, rate limit, malformed URL), log the failure and continue with available data. API results supplement web searches — they are not required for the landscape report to be valid.
 
