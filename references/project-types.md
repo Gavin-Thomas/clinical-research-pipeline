@@ -1,6 +1,6 @@
 # Project Types Reference
 
-This file defines how the clinical research pipeline adapts for each of the 6 supported project types. SKILL.md files read `project_type` from `project.yaml` and consult this reference to determine type-specific behavior at each stage.
+This file defines how the clinical research pipeline adapts for each of the 8 supported project types. SKILL.md files read `project_type` from `project.yaml` and consult this reference to determine type-specific behavior at each stage.
 
 ---
 

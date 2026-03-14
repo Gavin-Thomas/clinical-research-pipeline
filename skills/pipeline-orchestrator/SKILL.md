@@ -248,9 +248,10 @@ Execute in order, adapting for project type per `references/project-types.md`:
 ### Stage 4: Database Search Build
 - Skill: `skills/database-search-build/SKILL.md`
 - Prerequisite: `03_inclusion_exclusion/criteria.md`
-- Output: `04_database_search/search_strategy.md`
+- Output: `04_database_search/search_strategy.md` (or `data_collection_instruments.md` for original_research)
 - **MANUAL HANDOFF after this stage**
 - **Skip for:** case_report
+- **Modified for:** original_research (builds data collection instruments, not search strategies)
 
 ### Manual Handoff 1
 
@@ -298,6 +299,7 @@ Include how many records each database returned (for PRISMA flow diagram).
 - Output: `05_screening/screened_results.csv`
 - **MANUAL HANDOFF after this stage**
 - **Skip for:** case_report
+- **Modified for:** original_research (data cleaning, not abstract screening)
 
 ### Manual Handoff 2
 
