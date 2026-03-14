@@ -10,13 +10,13 @@ The default pipeline. All stages execute as documented in the stage SKILL.md fil
 
 ### Stage-by-Stage Adaptations
 
-- **Stage 1 (Topic Refinement):** Standard PICO/PICOS framework development.
-- **Stage 2 (Search Strategy):** Standard search strategy across all specified databases.
-- **Stage 3 (Screening):** Standard inclusion/exclusion criteria. Screening decisions use INCLUDE/EXCLUDE/UNCERTAIN.
-- **Stage 4 (Quality Assessment):** Standard critical appraisal with appropriate risk-of-bias tools.
-- **Stage 5 (Data Extraction):** 3 extractors perform independent extraction. Quick Review (severity 1-4) / Full Review (severity 5-7) thresholds apply.
-- **Stage 6 (Synthesis):** Meta-analysis performed per project setting. Narrative synthesis accompanies quantitative results.
-- **Stage 7 (Manuscript):** PRISMA 2020 reporting guideline.
+- **Stage 1 (Literature Search):** Standard PICO/PICOS framework development.
+- **Stage 2 (Research Question):** Standard search strategy across all specified databases.
+- **Stage 3 (Inclusion/Exclusion):** Standard inclusion/exclusion criteria. Screening decisions use INCLUDE/EXCLUDE/UNCERTAIN.
+- **Stage 4 (Database Search Build):** Standard critical appraisal with appropriate risk-of-bias tools.
+- **Stage 5 (Abstract Screening):** 3 extractors perform independent extraction. Quick Review (severity 1-4) / Full Review (severity 5-7) thresholds apply.
+- **Stage 6 (Data Extraction & Synthesis):** Meta-analysis performed per project setting. Narrative synthesis accompanies quantitative results.
+- **Stage 7 (Manuscript Writing):** PRISMA 2020 reporting guideline.
 
 ---
 
@@ -26,13 +26,13 @@ Broader in scope than a systematic review. Aims to map the available evidence ra
 
 ### Stage-by-Stage Adaptations
 
-- **Stage 1 (Topic Refinement):** Standard, but research questions are broader (PCC framework: Population, Concept, Context).
-- **Stage 2 (Search Strategy):** Standard, typically with broader search terms reflecting the exploratory nature.
-- **Stage 3 (Screening):** Broader inclusion criteria. Eligibility is more expansive to capture the breadth of available literature.
-- **Stage 4 (Quality Assessment):** Standard critical appraisal (optional per scoping review methodology; follows project setting).
-- **Stage 5 (Data Extraction):** Charting process replaces standard extraction. Classification decisions use **MAP / OUT_OF_SCOPE / UNCERTAIN** instead of INCLUDE / EXCLUDE. Data is charted into thematic categories rather than extracted for pooling.
-- **Stage 6 (Synthesis):** **Narrative synthesis only.** No meta-analysis is performed regardless of project setting. Results are presented as thematic maps, frequency counts, and descriptive summaries.
-- **Stage 7 (Manuscript):** **PRISMA-ScR** (PRISMA Extension for Scoping Reviews) reporting guideline.
+- **Stage 1 (Literature Search):** Standard, but research questions are broader (PCC framework: Population, Concept, Context).
+- **Stage 2 (Research Question):** Standard, typically with broader search terms reflecting the exploratory nature.
+- **Stage 3 (Inclusion/Exclusion):** Broader inclusion criteria. Eligibility is more expansive to capture the breadth of available literature.
+- **Stage 4 (Database Search Build):** Standard critical appraisal (optional per scoping review methodology; follows project setting).
+- **Stage 5 (Abstract Screening):** Charting process replaces standard extraction. Classification decisions use **MAP / OUT_OF_SCOPE / UNCERTAIN** instead of INCLUDE / EXCLUDE. Data is charted into thematic categories rather than extracted for pooling.
+- **Stage 6 (Data Extraction & Synthesis):** **Narrative synthesis only.** No meta-analysis is performed regardless of project setting. Results are presented as thematic maps, frequency counts, and descriptive summaries.
+- **Stage 7 (Manuscript Writing):** **PRISMA-ScR** (PRISMA Extension for Scoping Reviews) reporting guideline.
 
 ---
 
@@ -42,13 +42,13 @@ A streamlined systematic review with methodological shortcuts to accelerate deli
 
 ### Stage-by-Stage Adaptations
 
-- **Stage 1 (Topic Refinement):** Standard, with tighter scope to facilitate rapid completion.
-- **Stage 2 (Search Strategy):** May use fewer databases or date restrictions. All deviations documented.
-- **Stage 3 (Screening):** Standard criteria. May use single-screener with verification sample.
-- **Stage 4 (Quality Assessment):** Standard, though abbreviated tools may be used.
-- **Stage 5 (Data Extraction):** **Single extractor** (no independent dual/triple extraction). Quick Review thresholds apply to **ALL stages** (no Full Review escalation).
-- **Stage 6 (Synthesis):** **Abbreviated synthesis.** Quantitative pooling permitted but narrative summary is condensed.
-- **Stage 7 (Manuscript):** **PRISMA 2020 with deviations noted.** A dedicated **Limitations section** is required in the manuscript, explicitly listing all methodological shortcuts taken and their potential impact on findings.
+- **Stage 1 (Literature Search):** Standard, with tighter scope to facilitate rapid completion.
+- **Stage 2 (Research Question):** May use fewer databases or date restrictions. All deviations documented.
+- **Stage 3 (Inclusion/Exclusion):** Standard criteria. May use single-screener with verification sample.
+- **Stage 4 (Database Search Build):** Standard, though abbreviated tools may be used.
+- **Stage 5 (Abstract Screening):** **Single extractor** (no independent dual/triple extraction). Quick Review thresholds apply to **ALL stages** (no Full Review escalation).
+- **Stage 6 (Data Extraction & Synthesis):** **Abbreviated synthesis.** Quantitative pooling permitted but narrative summary is condensed.
+- **Stage 7 (Manuscript Writing):** **PRISMA 2020 with deviations noted.** A dedicated **Limitations section** is required in the manuscript, explicitly listing all methodological shortcuts taken and their potential impact on findings.
 
 ---
 
@@ -58,14 +58,14 @@ Primary data collection study (observational or interventional). The pipeline re
 
 ### Stage-by-Stage Adaptations
 
-- **Stage 1 (Topic Refinement):** Standard. Develops research question and hypothesis.
-- **Stage 2 (Search Strategy):** Standard. Background literature search to establish gaps and inform study design.
-- **Stage 3 (Protocol Design):** **Modified stage.** Methodologist and PI collaboratively design the study protocol. Output: `study_protocol.md` placed in the project directory.
-- **Stage 4 (Instrument Development):** **Modified stage.** Methodologist builds data collection instruments (surveys, case report forms, interview guides). Output: `data_collection_instruments.md` placed in the project directory.
-- **Manual Handoff:** Shifts to data collection. The research team collects data per the protocol. Raw data files are placed in `full_texts/` (or a designated data directory) upon completion.
-- **Stage 5 (Data Cleaning):** **Single-pass data cleaning.** Methodologist performs data validation, coding, and preparation for analysis. No multi-extractor workflow.
-- **Stage 6 (Analysis):** **Statistician performs primary data analysis.** Statistical methods as specified in the study protocol.
-- **Stage 7 (Manuscript):** Uses **STROBE** (observational studies) or **CONSORT** (randomized trials) reporting guideline as appropriate to the study design.
+- **Stage 1 (Literature Search):** Standard. Develops research question and hypothesis.
+- **Stage 2 (Research Question):** Standard. Background literature search to establish gaps and inform study design.
+- **Stage 3 (Inclusion/Exclusion → Protocol Design):** **Modified stage.** Methodologist and PI collaboratively design the study protocol. Output: `03_inclusion_exclusion/study_protocol.md`.
+- **Stage 4 (Database Search → Instrument Development):** **Modified stage.** Methodologist builds data collection instruments (surveys, case report forms, interview guides). Output: `04_database_search/data_collection_instruments.md`.
+- **Manual Handoff:** Shifts to data collection. The research team collects data per the protocol. Raw data files are placed in `06_data_extraction/raw_data/` upon completion.
+- **Stage 5 (Abstract Screening → Data Cleaning):** **Single-pass data cleaning.** Statistician performs data validation, coding, and preparation for analysis. No multi-extractor workflow.
+- **Stage 6 (Data Extraction → EDA + Analysis):** **Statistician performs exploratory data analysis (Step 2b) then pre-specified statistical analysis.** EDA informs parametric vs. non-parametric choices and flags protocol deviations for PI review.
+- **Stage 7 (Manuscript Writing):** Uses **STROBE** (observational studies) or **CONSORT** (randomized trials) reporting guideline as appropriate to the study design.
 
 ---
 
@@ -75,12 +75,12 @@ Clinical case presentation. The pipeline is significantly abbreviated, focusing 
 
 ### Stage-by-Stage Adaptations
 
-- **Stage 1 (Topic Refinement):** Standard. Identifies the clinical significance and learning points of the case.
-- **Stage 2 (Search Strategy):** Standard. Literature search to contextualize the case within existing evidence.
+- **Stage 1 (Literature Search):** Standard. Identifies the clinical significance and learning points of the case.
+- **Stage 2 (Research Question):** Standard. Literature search to contextualize the case within existing evidence.
 - **Stages 3-5:** **Skipped entirely.** No screening, quality assessment, or data extraction stages.
 - **Manual Handoff:** Single manual handoff. Clinical materials (patient records, imaging, lab results, clinical photographs) are placed in `full_texts/`.
 - **Stage 6 (Case Structuring):** **PI and Manuscript Writer** collaboratively structure the case presentation. Organizes clinical timeline, diagnostic workup, management decisions, and outcomes into a coherent narrative.
-- **Stage 7 (Manuscript):** **CARE guidelines** (CAse REport) reporting guideline.
+- **Stage 7 (Manuscript Writing):** **CARE guidelines** (CAse REport) reporting guideline.
 
 ---
 
@@ -91,14 +91,14 @@ Full systematic review pipeline with an extended quantitative synthesis phase. A
 ### Stage-by-Stage Adaptations
 
 - **Stages 1-5:** Identical to `systematic_review`. All standard procedures apply (3 extractors, Quick/Full Review thresholds, standard screening criteria).
-- **Stage 6 (Synthesis):** Standard systematic review synthesis, plus the **Statistician performs extended meta-analytic procedures:**
+- **Stage 6 (Data Extraction & Synthesis):** Standard systematic review synthesis, plus the **Statistician performs extended meta-analytic procedures:**
   - **Effect size models:** Fixed-effects and random-effects models.
   - **Forest plots:** Generated for each primary and secondary outcome.
   - **Heterogeneity assessment:** I² statistic, Cochran's Q test, tau² estimate, prediction intervals.
   - **Publication bias:** Funnel plots with visual inspection, Egger's regression test for asymmetry.
   - **Sensitivity analyses:** Leave-one-out analysis, subgroup analyses by pre-specified moderators.
   - **Output:** `meta_analysis_results.md` containing all statistical results, plots, and interpretation.
-- **Stage 7 (Manuscript):** **PRISMA 2020 with meta-analysis-specific items** included (per the PRISMA 2020 checklist items designated for reviews with meta-analysis).
+- **Stage 7 (Manuscript Writing):** **PRISMA 2020 with meta-analysis-specific items** included (per the PRISMA 2020 checklist items designated for reviews with meta-analysis).
 
 ---
 
@@ -149,7 +149,7 @@ Systematic synthesis of qualitative research findings. Used when the review ques
   5. **CERQual assessment** (GRADE equivalent for qualitative evidence): Rate confidence in each synthesised finding on: methodological limitations, coherence, adequacy of data, relevance. Output: Summary of Qualitative Findings table.
   - **No statistical analysis is performed.** No forest plots, no pooled estimates, no heterogeneity statistics. Python/R analysis scripts are not generated.
 
-- **Stage 7 (Manuscript):** **ENTREQ** (Enhancing Transparency in Reporting the Synthesis of Qualitative Research, 21-item checklist) reporting guideline. Key sections differ from quantitative reviews:
+- **Stage 7 (Manuscript Writing):** **ENTREQ** (Enhancing Transparency in Reporting the Synthesis of Qualitative Research, 21-item checklist) reporting guideline. Key sections differ from quantitative reviews:
   - Methods: Synthesis approach (thematic synthesis, meta-ethnography, etc.), sampling strategy for included studies, data extraction process, analytic process
   - Results: Analytical themes with illustrative participant quotes, CERQual confidence assessment table, Summary of Qualitative Findings
   - Discussion: Transferability of findings, researcher reflexivity note (note: the pipeline does not have subjective positionality — flag this as a transparency item for the PI to add)
@@ -199,7 +199,7 @@ Systematic review of the diagnostic performance of a clinical test (index test) 
   - **Code requirements (R):** Use `mada` package (functions: `reitsma()` for bivariate model, `ROCellipse()` for SROC plane, `SROCsens()` for HSROC); also `meta` for forest plots; save `sensitivity_forest.png`, `specificity_forest.png`, `sroc_curve.png`, `quadas2_traffic_light.png` to `06_data_extraction/analysis_scripts/outputs/`. Save script to `06_data_extraction/analysis_scripts/dta_analysis.R`.
   - **Output files:** `extracted_data.csv` (with 2×2 table), `quadas2_appraisal.md`, `synthesis_report.md`, `dta_analysis.R`, `meta_analysis_results.md` (pooled estimates + SROC).
 
-- **Stage 7 (Manuscript):** **STARD 2015** (30-item) reporting guideline. Key differences from intervention reviews:
+- **Stage 7 (Manuscript Writing):** **STARD 2015** (30-item) reporting guideline. Key differences from intervention reviews:
   - Methods must specify: index test execution protocol, reference standard protocol, blinding of test interpreters, time interval between tests, thresholds considered, statistical method for pooling (bivariate / HSROC).
   - Results must include: STARD flow diagram, study characteristics table including QUADAS-2 traffic light plot (Figure 1), sensitivity/specificity forest plots (Figures 2–3), SROC plot (Figure 4), GRADE-DTA summary of evidence table.
   - Discussion: Address spectrum bias if case-control studies included; address partial verification bias; clinical utility section (pre-test vs. post-test probability, Fagan nomogram for selected LR values if clinically useful).

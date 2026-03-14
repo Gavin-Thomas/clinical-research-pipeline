@@ -111,12 +111,14 @@ If you deduplicate manually, export the deduplicated set as `.ris` or `.csv` and
 
 After Stage 5, `05_screening/screened_results.csv` lists all included articles with authors, year, title, DOI, and PubMed ID.
 
-**Retrieval workflow (by priority):**
+**Step 1: Download auto-discovered OA PDFs (done for you)**
+The pipeline automatically queries the Unpaywall API for every included study with a DOI and writes results to `05_screening/oa_pdf_links.csv`. Typically 30–60% of articles are freely available. Download these first — no institutional access needed.
+
+**Step 2: Retrieve remaining paywalled articles (by priority):**
 1. **PubMed Central** — `https://www.ncbi.nlm.nih.gov/pmc/` — free, high coverage for NIH-funded research
-2. **Unpaywall** — `https://unpaywall.org/` browser extension — legal open-access versions (preprints, institutional repositories)
-3. **Institutional library access** — authenticate via your institution's proxy/VPN; most library portals allow DOI-based search
-4. **Interlibrary loan (ILL)** — for articles unavailable through the above; typically 24–72 hours
-5. **Author contact** — email corresponding author directly; most respond within days
+2. **Institutional library access** — authenticate via your institution's proxy/VPN; most library portals allow DOI-based search
+3. **Interlibrary loan (ILL)** — for articles unavailable through the above; typically 24–72 hours
+4. **Author contact** — email corresponding author directly; most respond within days
 
 **Naming convention:** Use the pipeline's expected format: `[FirstAuthor]_[Year]_[keyword].pdf` (e.g., `Smith_2022_dupilumab_AD.pdf`)
 

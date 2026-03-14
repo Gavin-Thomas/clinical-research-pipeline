@@ -375,9 +375,9 @@ Data collection instruments saved to 04_database_search/data_collection_instrume
 
 MANUAL STEP REQUIRED:
 1. Collect data per the study protocol and instruments
-2. Place raw data files in: 04_database_search/abstracts/
+2. Place raw data files (CSV, Excel, or other tabular format) in: 06_data_extraction/raw_data/
 
-When you're done, run /abstract-screening to continue.
+When data collection is complete: "I've placed the data in the raw_data folder — please continue"
 ```
 
 ## Process — Case Report

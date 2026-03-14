@@ -509,7 +509,7 @@ _Note: For original research, Stage 6 produces `synthesis_report.md` (analysis r
 
 **Qualitative Synthesis (conditional — if `project_type: qualitative_synthesis`)**
 - [ ] Every included qualitative study has an entry in `extracted_data.csv` with: design, setting, participants, data collection method, analytic approach, key themes/findings ✗✗
-- [ ] JBI Critical Appraisal Checklist scores are recorded for every study ✗✗
+- [ ] CASP Qualitative Checklist scores are recorded for every study ✗✗
 - [ ] `synthesis_report.md` documents the synthesis method (thematic synthesis / meta-ethnography / framework synthesis / meta-aggregation) and the analytical process step by step
 - [ ] Descriptive themes and analytical themes (or second-order and third-order concepts for meta-ethnography) are clearly distinguished ✗✗
 - [ ] CERQual confidence assessments are present for each synthesised finding: methodological limitations, coherence, adequacy, relevance ✗✗
