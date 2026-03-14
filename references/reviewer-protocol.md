@@ -387,9 +387,12 @@ Use the checklist below for the relevant stage. Each item is a binary pass/fail.
 - [ ] Framework type matches `project_type` in `project.yaml`: PICO for systematic_review/meta_analysis/rapid_review; PCC for scoping_review; PICo for qualitative_synthesis; PICOS for diagnostic_test_accuracy ✗✗
 - [ ] No component is left as "N/A" without documented justification
 
-**Novelty**
+**Novelty (verified by autonomous multi-source check)**
+- [ ] `02_research_question/novelty_check.md` exists and documents searches across all 5 sources (PubMed, Semantic Scholar, PROSPERO, Cochrane, WebSearch) ✗✗
 - [ ] Gap alignment cites a specific named review and section heading — not a generic novelty claim ✗✗
-- [ ] Web search for near-identical published reviews was performed (last 3 years); result documented in `research_question.md`
+- [ ] Novelty check verdict is PASS or FLAG-with-justification — not BLOCK or unresolved REVISE REQUIRED ✗✗
+- [ ] If any existing review scored ≥1.5 overlap, a differentiation statement is present in `novelty_check.md` explaining how this question differs ✗✗
+- [ ] No active PROSPERO registration with "Ongoing" status and overlap ≥2.5 was found — or if found, the question has been substantially revised to differentiate ✗✗
 - [ ] If a near-identical review was found, the question has been scoped or framed to avoid duplication
 
 **Feasibility and Clinical Significance**

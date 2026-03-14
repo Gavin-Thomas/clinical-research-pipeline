@@ -260,6 +260,39 @@ url = f"https://api.unpaywall.org/v2/{doi}?email=researcher@university.edu"
 
 ---
 
+## Novelty Check Pattern (Stage 2)
+
+Used in Step 3a of the Research Question skill to verify the proposed question hasn't already been answered by an existing or in-progress review. Searches 5 sources in parallel.
+
+```
+1. PubMed E-utilities:
+   - Build query: {PICO terms} AND (systematic review[pt] OR meta-analysis[pt])
+   - Filter: last 3 years (datetype=pdat)
+   - WebFetch ESearch (retmax=20) → WebFetch EFetch for titles/abstracts
+
+2. Semantic Scholar:
+   - Natural language query from research question
+   - Filter to Medicine, last 3 years
+   - WebFetch paper/search endpoint → filter to review-type papers
+
+3. PROSPERO:
+   - WebSearch: site:crd.york.ac.uk/prospero {PICO terms}
+   - Check for "Ongoing" registrations — these indicate someone is already doing this review
+
+4. Cochrane Library:
+   - WebSearch: site:cochranelibrary.com {PICO terms} review
+   - Cochrane protocols are near-certain to be published
+
+5. WebSearch (catch-all):
+   - General search for preprints and non-indexed reviews
+
+Score each result 0–4 based on PICO component overlap.
+BLOCK if score ≥3.5 or if ongoing PROSPERO/Cochrane with ≥2.5.
+Write results to 02_research_question/novelty_check.md.
+```
+
+---
+
 ## API Integration Patterns
 
 ### Autonomous Search Refinement Loop (autoresearch-inspired)

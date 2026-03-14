@@ -112,51 +112,120 @@ Before finalizing, verify each item and correct inline if any fail:
 Correct any failures inline. Do not present the question to the user until all self-check items pass.
 ```
 
-### Step 3a: Autonomous Novelty Check
+### Step 3a: Autonomous Novelty Check (Multi-Source)
 
-After the PI selects the final question but before presenting to the user, perform an autonomous novelty check using WebSearch. This step is NOT delegated to the user — the agent performs it directly.
+After the PI selects the final question but before presenting to the user, perform a comprehensive autonomous novelty check. This step is NOT delegated to the user — the agent searches all available sources directly. A duplicate review wastes months of work; this check is critical.
 
-**Procedure:**
+**Source 1: PubMed — Published reviews (via E-utilities API)**
 
-1. **Construct search queries.** From the PI's selected question, build 2–3 search queries:
-   - Query 1: The full research question as a quoted phrase + "systematic review" OR "meta-analysis"
-   - Query 2: Key PICO terms (population + intervention/exposure + outcome) + "systematic review" + last 3 years
-   - Query 3: Key PICO terms + the specific journal or field + "review"
-
-2. **Execute searches.** Use WebSearch for each query. Collect the top 5 results per query.
-
-3. **Evaluate overlap.** For each result that appears to be a published systematic review or meta-analysis:
-   - Compare its PICO/scope to the proposed question
-   - Rate overlap: **Identical** (same PICO, same scope) / **Substantial** (same population + intervention, different outcome or timeframe) / **Partial** (shares 1-2 PICO components) / **None**
-
-4. **Act on findings:**
-
-   | Overlap Level | Action |
-   |---|---|
-   | **Identical** found (published in last 3 years) | **REVISE REQUIRED** — re-dispatch PI to narrow scope, change outcome, extend timeframe, or target a different sub-population. The PI must explain how the revised question differs from the existing review. |
-   | **Substantial** found | **FLAG** — note the existing review in the output. PI must state how this question extends, updates, or differs from the existing review. Proceed if justified. |
-   | **Partial** or **None** | **PASS** — no near-duplicate found. Proceed. |
-
-5. **Write novelty check results** to `02_research_question/novelty_check.md`:
-
-   ```markdown
-   # Novelty Check Results
-
-   ## Search Queries Used
-   1. [query 1]
-   2. [query 2]
-   3. [query 3]
-
-   ## Existing Reviews Found
-   | # | Title | Authors | Year | Journal | Overlap | PICO Comparison |
-   |---|---|---|---|---|---|---|
-   | 1 | [title] | [authors] | [year] | [journal] | Substantial | Same population, different outcome |
-
-   ## Verdict: [PASS / FLAG / REVISE REQUIRED]
-   [Justification — how the proposed question differs from existing reviews, or why revision is needed]
+1. Build a PubMed query combining key PICO terms + publication type filter for reviews:
    ```
+   ({population terms}[MeSH] OR {population terms}[tiab]) AND ({intervention terms}[MeSH] OR {intervention terms}[tiab]) AND (systematic review[pt] OR meta-analysis[pt] OR "systematic review"[tiab] OR "meta-analysis"[tiab])
+   ```
+2. Add date filter: `&mindate={3 years ago}&maxdate={today}&datetype=pdat`
+3. WebFetch the ESearch URL with `retmax=20&retmode=json` to get PMIDs
+4. WebFetch the EFetch URL for those PMIDs to get titles and abstracts
+5. For each result, compare PICO scope to the proposed question
 
-If the verdict is REVISE REQUIRED, loop back to Step 3 — re-dispatch the PI with the novelty check results and instruction to revise. Do not proceed to Step 3.5 until the novelty check passes or is flagged-with-justification.
+**Source 2: Semantic Scholar — Semantic similarity search**
+
+1. Build a natural language query from the research question
+2. WebFetch: `https://api.semanticscholar.org/graph/v1/paper/search?query={query}&limit=20&fields=paperId,title,abstract,year,citationCount,authors,externalIds,tldr&year={3 years ago}-{current year}`
+3. Filter results to papers with "systematic review", "meta-analysis", or "scoping review" in the title or abstract
+4. Compare PICO scope — Semantic Scholar catches conceptually similar reviews that different keywords would miss
+
+**Source 3: PROSPERO — Registered in-progress reviews**
+
+1. WebSearch: `site:crd.york.ac.uk/prospero {population} {intervention} {outcome}`
+2. Also try: `PROSPERO "{population}" "{intervention}" systematic review`
+3. For each PROSPERO registration found, read the title and PICO — an in-progress review with identical PICO is as problematic as a published one (the user would be scooped)
+
+**Source 4: Cochrane Library — Gold-standard reviews**
+
+1. WebSearch: `site:cochranelibrary.com {population} {intervention} {outcome} review`
+2. Check for existing Cochrane reviews or protocols on the same topic
+3. A Cochrane review on an identical topic is a strong signal — the user's review would need a clear differentiation (different population, updated evidence, different outcomes)
+
+**Source 5: WebSearch — General catch-all**
+
+1. Query: `"{population}" "{intervention}" "systematic review" OR "meta-analysis" {last 3 years}`
+2. Catches preprints, non-indexed journals, and grey literature the APIs miss
+
+**Overlap Scoring**
+
+For each result from all 5 sources, score PICO overlap on a 4-point scale:
+
+| Component | Match Criteria | Points |
+|---|---|---|
+| Population | Same condition + same demographic scope | 1 |
+| Intervention/Exposure | Same intervention or exposure category | 1 |
+| Comparator | Same comparator (or both have no comparator) | 0.5 |
+| Outcome | Same primary outcome measure | 1 |
+| Timeframe | Overlapping search date range (>50% overlap) | 0.5 |
+
+**Total score interpretation:**
+
+| Score | Overlap Level | Action |
+|---|---|---|
+| ≥3.5 | **Identical** | **BLOCK** — do not proceed. Re-dispatch PI to substantially revise scope. The PI must demonstrate ≥2 PICO component differences from the existing review. |
+| 2.5–3.4 | **Substantial** | **REVISE REQUIRED** — re-dispatch PI to differentiate. PI must state precisely how this review extends, narrows, or updates the existing one. Proceed only with documented justification. |
+| 1.5–2.4 | **Partial** | **FLAG** — note the related review in the output. No revision required, but PI must acknowledge it in the Expected Contribution section. |
+| <1.5 | **None** | **PASS** — no near-duplicate found. Proceed. |
+
+**Special cases:**
+- **PROSPERO registration with status "Ongoing"** and overlap ≥2.5: **BLOCK** regardless of score — the user will be scooped. PI must either differentiate substantially or choose a different question.
+- **Cochrane protocol registered** with overlap ≥2.5: **BLOCK** — Cochrane protocols are virtually certain to be published. Same action as above.
+- **Multiple partial overlaps** (≥3 reviews with score 1.5–2.4): **FLAG as saturated** — the topic area may be well-covered even if no single review is identical. PI must justify why another review adds value.
+
+**Write novelty check results** to `02_research_question/novelty_check.md`:
+
+```markdown
+# Novelty Check Results
+
+**Date:** [timestamp]
+**Proposed Question:** [full research question]
+
+## Sources Searched
+| Source | Query Used | Results Found |
+|---|---|---|
+| PubMed (E-utilities) | [query] | [N] reviews |
+| Semantic Scholar | [query] | [N] reviews |
+| PROSPERO | [query] | [N] registrations |
+| Cochrane Library | [query] | [N] reviews/protocols |
+| WebSearch | [query] | [N] results |
+
+## Existing Reviews & Registrations Found
+
+| # | Source | Title | Authors | Year | Journal/Registry | Status | Overlap Score | PICO Comparison |
+|---|---|---|---|---|---|---|---|---|
+| 1 | PubMed | [title] | [first author et al.] | [year] | [journal] | Published | 3.0 | Same P+I, different O |
+| 2 | PROSPERO | [title] | [registrant] | [year] | CRD[number] | Ongoing | 2.5 | Same P+I+O, narrower population |
+
+## Overlap Analysis
+
+### Highest-scoring match
+- **Title:** [title]
+- **Score:** [N]/4
+- **Component comparison:**
+  | Component | Proposed Question | Existing Review | Match? |
+  |---|---|---|---|
+  | Population | [proposed P] | [existing P] | Yes/Partial/No |
+  | Intervention | [proposed I] | [existing I] | Yes/Partial/No |
+  | Comparator | [proposed C] | [existing C] | Yes/No |
+  | Outcome | [proposed O] | [existing O] | Yes/Partial/No |
+  | Timeframe | [proposed dates] | [existing dates] | Overlapping/Distinct |
+
+### Differentiation statement
+[How the proposed question differs — required if any result scored ≥1.5]
+
+## Verdict: [PASS / FLAG / REVISE REQUIRED / BLOCK]
+[Justification — specific reasons this question is or is not novel]
+```
+
+**Iteration logic:**
+- If **BLOCK** or **REVISE REQUIRED**: loop back to Step 3. Re-dispatch the PI with the full `novelty_check.md` and instruct them to revise. The PI must produce a revised question with a clear differentiation statement. Re-run the novelty check on the revised question (max 2 revision cycles before escalating to human PI).
+- If **FLAG**: proceed to Step 3.5 but include the flagged reviews in the user presentation so they can make an informed decision.
+- If **PASS**: proceed to Step 3.5.
 
 ### Step 3.5: Present to User for Confirmation
 
