@@ -2,21 +2,64 @@
 
 _For all project types except `qualitative_synthesis`, `case_report`, and `diagnostic_test_accuracy`._
 
-### Step 1: Fetch Journal Guidelines
+### Step 1: Load or Fetch Journal Guidelines
 
-Use WebFetch to retrieve the target journal's author guidelines from `journal_guidelines_url` in `project.yaml`.
+First, check if `00_journal_guidelines/guidelines_summary.md` exists (created at project setup by the orchestrator). If it does, read it and use it as the journal guidelines — do NOT re-fetch.
 
-Extract and note:
-- Word/character limits (abstract, full text)
-- Required sections and order
-- Reference formatting style (Vancouver, APA, etc.)
-- Table/figure formatting requirements
-- Required supplementary materials
-- Reporting checklist requirements (PRISMA, etc.)
-- Structured abstract format (if required)
-- Conflict of interest / funding statement requirements
+If it does not exist (journal was "undecided" at setup, or guidelines were not fetched):
+- Use WebFetch to retrieve the target journal's author guidelines from `journal_guidelines_url` in `project.yaml`.
+- Extract and note:
+  - Word/character limits (abstract, full text)
+  - Required sections and order
+  - Reference formatting style (Vancouver, APA, etc.)
+  - Table/figure formatting requirements
+  - Required supplementary materials
+  - Reporting checklist requirements (PRISMA, etc.)
+  - Structured abstract format (if required)
+  - Conflict of interest / funding statement requirements
+- Write the summary to `00_journal_guidelines/guidelines_summary.md` for the record.
+- If WebFetch fails, ask the user to paste the guidelines.
 
-If WebFetch fails, ask the user to paste the guidelines.
+### Step 1a: Journal Compliance Pre-Validation
+
+Before any writing begins, validate that the planned manuscript structure will meet the journal's requirements. This catches formatting mismatches early rather than during review.
+
+**Pre-validation checklist:**
+
+| Requirement | Source | Check |
+|---|---|---|
+| Abstract format | `guidelines_summary.md` | Confirm required headings (Background/Methods/Results/Conclusions or custom) match the `reporting_standard` abstract template |
+| Word limit feasibility | `guidelines_summary.md` | Estimate word count based on included study count and synthesis complexity; flag if likely to exceed limit |
+| Required sections | `guidelines_summary.md` | Map journal-required sections to the planned manuscript outline; flag any missing or extra sections |
+| Reference style | `guidelines_summary.md` | Confirm the style (Vancouver/APA/etc.) and set it as instruction for Writer agents |
+| Table/figure limits | `guidelines_summary.md` | Count planned tables (study characteristics, SoF/GRADE, RoB) and figures (PRISMA, forest plots); flag if exceeding journal limits |
+| Reporting checklist | `guidelines_summary.md` | Confirm the journal requires the same checklist as `reporting_standard` in `project.yaml`; flag conflicts |
+
+**Write pre-validation report** to `07_manuscript/journal_compliance.md`:
+
+```markdown
+# Journal Compliance Pre-Validation
+
+**Journal:** [name]
+**Reporting standard:** [from project.yaml]
+
+## Checks
+| Requirement | Status | Notes |
+|---|---|---|
+| Abstract format | PASS/FLAG | [notes] |
+| Word limit | PASS/FLAG | Estimated ~[N] words; limit is [N] |
+| Required sections | PASS/FLAG | [missing sections, if any] |
+| Reference style | SET | [style name] |
+| Table/figure count | PASS/FLAG | [N] planned vs. [N] allowed |
+| Reporting checklist | PASS/FLAG | [match or conflict] |
+
+## Writer Instructions
+[Specific formatting instructions derived from the journal guidelines that should be passed to Writer A and Writer B — section order, heading styles, abstract structure, reference format]
+```
+
+If any check is **FLAG**: print a warning to the user before proceeding. The user may adjust the target journal, accept the limitation, or provide additional guidance. Do not stop the pipeline — FLAGS are warnings, not blockers.
+
+Pass the `journal_compliance.md` Writer Instructions section to all Writer agent prompts (Step 2) along with the full guidelines summary.
 
 ### Step 1b: PRISMA Flow Diagram Generation
 

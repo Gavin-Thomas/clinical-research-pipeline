@@ -80,9 +80,65 @@ For `qualitative_synthesis`, help them frame a PICo question instead: Population
 
 For `diagnostic_test_accuracy`, help them frame a PICOS question: Population (patients suspected of having the condition — specify spectrum of severity), Index test (the test being evaluated — name, protocol, threshold), Comparator (reference standard / gold standard test), Outcome (diagnostic accuracy: sensitivity, specificity, AUC, likelihood ratios), Study design (cross-sectional or cohort applying both index and reference standard). Ask whether partial verification is a concern (i.e., whether all patients received the reference standard) and whether multiple thresholds or a single cut-off are of interest.
 
+### Fetch Journal Guidelines Early
+
+If the user provides a `target_journal` (not "undecided") at project setup, fetch and parse the journal's author guidelines immediately — do not wait until Stage 7.
+
+1. If `journal_guidelines_url` was provided, use WebFetch to retrieve the page.
+2. If only `target_journal` was provided (no URL), use WebSearch to find the journal's "Instructions for Authors" or "Author Guidelines" page, then WebFetch the result.
+3. Parse the guidelines and extract:
+   - Word/character limits (abstract, main text)
+   - Required sections and order
+   - Reference formatting style (Vancouver, APA, Harvard, etc.)
+   - Abstract format (structured vs. unstructured; required headings)
+   - Table/figure limits and formatting requirements
+   - Supplementary materials requirements
+   - Reporting checklist requirements (PRISMA, CONSORT, etc.)
+   - Conflict of interest / funding / ethics statement requirements
+4. Write the parsed summary to `00_journal_guidelines/guidelines_summary.md`:
+
+   ```markdown
+   # Journal Guidelines Summary
+
+   **Journal:** [name]
+   **URL:** [guidelines URL]
+   **Fetched:** [date]
+
+   ## Word Limits
+   - Abstract: [limit] words ([structured/unstructured])
+   - Main text: [limit] words
+   - References: [limit or unlimited]
+
+   ## Required Sections (in order)
+   1. [section 1]
+   2. [section 2]
+   ...
+
+   ## Reference Style
+   [Vancouver / APA / etc. — with brief formatting notes]
+
+   ## Abstract Format
+   [Structured with headings: Background, Methods, Results, Conclusions / Unstructured / etc.]
+
+   ## Tables & Figures
+   - Maximum tables: [N or unlimited]
+   - Maximum figures: [N or unlimited]
+   - Format requirements: [notes]
+
+   ## Reporting Checklists
+   [Required checklists per journal policy]
+
+   ## Other Requirements
+   [Ethics statement, funding, COI, data availability, etc.]
+   ```
+
+5. Store the `journal_guidelines_url` in `project.yaml` (update if it was found via search).
+
+If WebFetch fails or the journal is "undecided", skip this step — Stage 7 will prompt the user for guidelines.
+
 ### Create Project Structure
 
-Create the full directory structure per `references/directory-conventions.md`.
+Create the full directory structure per `references/directory-conventions.md` (including `00_journal_guidelines/`).
 
 Write `project.yaml`:
 
@@ -166,8 +222,9 @@ For each stage, the orchestrator:
    - The full content of `references/project-types.md`
    - Instruction: "Execute the skill instructions above for the current project."
 4. **Verifies output**: Checks that expected output files were created
-5. **Updates status**: Sets stage to `completed` in `project.yaml`
-6. **Proceeds or pauses**: Moves to next stage, or pauses at manual handoff points
+5. **Cross-stage consistency check**: Before advancing, validates that the new stage output is consistent with all prior stage outputs (see Cross-Stage Consistency Checks below)
+6. **Updates status**: Sets stage to `completed` in `project.yaml`
+7. **Proceeds or pauses**: Moves to next stage, or pauses at manual handoff points
 
 ### Stage Dispatch Template
 
@@ -227,6 +284,41 @@ Execute the skill instructions above. Read input files from the project director
 files to the correct locations per the directory conventions. Follow the reviewer protocol as
 specified in the skill. Update project.yaml when complete.
 ```
+
+## Cross-Stage Consistency Checks
+
+After each stage completes (step 5 above), the orchestrator validates that the new output is internally consistent with all prior stage outputs. If a check fails, the orchestrator re-dispatches the producing agent with the inconsistency and the conflicting prior output, then re-runs the review. This prevents drift between stages when revisions are made.
+
+| Completing Stage | Consistency Check | Prior Output Referenced | Failure Action |
+|---|---|---|---|
+| Stage 2 (Research Question) | PICO/PEO/PCC components align with gaps identified in landscape report | `01_literature_search/landscape_report.md` | Re-dispatch PI with the specific gap mismatch; PI must either realign the question or cite a different gap |
+| Stage 3 (Inclusion/Exclusion) | Every PICO component from the finalized research question maps to at least one inclusion criterion; no criterion contradicts the research question | `02_research_question/research_question.md` | Re-dispatch Methodologist with the unmapped component(s) |
+| Stage 4 (Database Search) | Every inclusion criterion concept appears as a search block or keyword; date range matches criteria | `03_inclusion_exclusion/criteria.md` | Re-dispatch Librarian with the missing concept(s) |
+| Stage 5 (Screening) | Screening decisions reference criteria from `criteria.md` by name; no EXCLUDE cites a criterion that doesn't exist | `03_inclusion_exclusion/criteria.md` | Flag phantom criteria in reconciliation; Methodologist re-reconciles affected rows |
+| Stage 6 (Data Extraction) | Extraction template columns cover all outcomes specified in the research question; synthesis addresses every outcome | `02_research_question/research_question.md`, `03_inclusion_exclusion/criteria.md` | Re-dispatch Statistician to add missing outcome columns or synthesis sections |
+| Stage 7 (Manuscript) | Methods section accurately describes the search strategy, screening process, and synthesis approach used in prior stages; PRISMA numbers match screening/extraction counts | All prior outputs | Re-dispatch Writer with the specific discrepancy and correct source data |
+
+### How to run the check
+
+After the stage output is written and the review cycle completes with APPROVE:
+
+1. Read the new stage output and all prior outputs listed in the table above for the completing stage.
+2. For each check in the row, verify the condition. Produce a pass/fail for each.
+3. If all pass → proceed to update `project.yaml` and advance.
+4. If any fail → print:
+   ```
+   ⚠ Cross-stage inconsistency detected after Stage [N]:
+   - [Description of the mismatch]
+   - Prior output: [file path and relevant excerpt]
+   - Current output: [file path and relevant excerpt]
+
+   Re-dispatching [agent] to resolve...
+   ```
+5. Re-dispatch the appropriate agent (per the Failure Action column) with the inconsistency details.
+6. After the agent revises, re-run the stage review (Quick or Full per tier) on the revised output.
+7. If the inconsistency persists after 2 resolution attempts, escalate to human PI.
+
+---
 
 ## Pipeline Stages
 

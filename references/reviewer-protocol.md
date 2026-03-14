@@ -186,6 +186,88 @@ When review iterations are exhausted without an APPROVE verdict, the pipeline mu
 
 ---
 
+## Revision History Archival
+
+Every review iteration must be logged to a persistent `revision_history.md` file in the stage's output directory. This creates an auditable trail of what was flagged, what was changed, and what was accepted.
+
+### File Location
+
+Each stage writes its revision history to its own directory:
+
+| Stage | Path |
+|---|---|
+| Stage 1 | `01_literature_search/revision_history.md` |
+| Stage 2 | `02_research_question/revision_history.md` |
+| Stage 3 | `03_inclusion_exclusion/revision_history.md` |
+| Stage 4 | `04_database_search/revision_history.md` |
+| Stage 5 | `05_screening/revision_history.md` |
+| Stage 6 | `06_data_extraction/revision_history.md` |
+| Stage 7 | `07_manuscript/revision_history.md` (also see `revision_log.md` for quality metrics) |
+
+### Format
+
+Append to the file after each review cycle (do not overwrite previous entries):
+
+```markdown
+# Revision History — Stage [N]: [Stage Name]
+
+---
+
+## Iteration 0 — Initial Review
+
+**Reviewer(s):** [Quick Review: Reviewer 1 / Full Review: Reviewer A, Reviewer B]
+**Verdict:** [APPROVE / REVISE / REJECT]
+**Date:** [timestamp]
+
+### Findings
+| # | Severity | Finding | Section Affected |
+|---|---|---|---|
+| 1 | Major | [description] | [section] |
+| 2 | Minor | [description] | [section] |
+
+### Action Taken
+[If APPROVE: "No revisions needed — proceeding to next stage."]
+[If REVISE/REJECT: describe each change made by the producing agent(s)]
+
+---
+
+## Iteration 1 — Re-Review After Revision
+
+**Reviewer(s):** [same or updated]
+**Verdict:** [APPROVE / REVISE / REJECT]
+**Date:** [timestamp]
+
+### Findings
+[New findings table, or "All prior findings resolved."]
+
+### Action Taken
+[Description of changes, or "Approved — proceeding."]
+
+---
+
+[Continue appending for each iteration...]
+```
+
+### Rules
+
+1. **Always append, never overwrite.** Each iteration adds a new `## Iteration N` section.
+2. **Record even APPROVE iterations.** An APPROVE with zero findings should still be logged with "No findings — approved."
+3. **Include cross-stage consistency check results** (if applicable). If the orchestrator's cross-stage check found inconsistencies after the review approved, log those as a separate subsection:
+   ```
+   ### Cross-Stage Consistency Check
+   - **Result:** FAIL — [description of inconsistency]
+   - **Resolution:** [what the agent changed]
+   ```
+4. **On escalation to human PI**, log the escalation with the PI's resolution:
+   ```
+   ### Human PI Escalation
+   - **Reason:** [review_iteration >= max without APPROVE]
+   - **PI Decision:** [accept as-is / specific revision guidance / terminate]
+   - **Resolution:** [what was done]
+   ```
+
+---
+
 ## Review Dispatch Template
 
 Use this exact prompt structure when dispatching an Independent Reviewer subagent. Replace all `[bracketed]` placeholders with actual values.

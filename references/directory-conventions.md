@@ -12,18 +12,24 @@ Every project lives in its own directory under the pipeline workspace. The direc
 <project-name>/
 ├── project.yaml
 ├── 01_literature_search/
-│   └── landscape_report.md
+│   ├── landscape_report.md
+│   └── revision_history.md         # Review iteration log (auto-generated)
 ├── 02_research_question/
-│   └── research_question.md
+│   ├── research_question.md
+│   ├── novelty_check.md            # Autonomous novelty search results (auto-generated)
+│   └── revision_history.md
 ├── 03_inclusion_exclusion/
-│   └── criteria.md
+│   ├── criteria.md
+│   └── revision_history.md
 ├── 04_database_search/
 │   ├── search_strategy.md
+│   ├── revision_history.md
 │   └── abstracts/                  # MANUAL — user places downloaded abstract files here
 ├── 05_screening/
 │   ├── screened_results.csv
 │   ├── screening_progress.yaml
-│   └── oa_pdf_links.csv            # Unpaywall OA PDF links (auto-generated)
+│   ├── oa_pdf_links.csv            # Unpaywall OA PDF links (auto-generated)
+│   └── revision_history.md
 ├── 06_data_extraction/
 │   ├── extraction_template.csv     # review types only
 │   ├── extracted_data.csv          # review types only
@@ -39,12 +45,18 @@ Every project lives in its own directory under the pipeline workspace. The direc
 │   │   ├── meta_analysis_primary.py
 │   │   ├── code_review.md
 │   │   └── outputs/
-│   └── raw_data/                   # original_research only — user places data here
-└── 07_manuscript/
-    ├── manuscript.md
-    ├── references.bib
-    ├── proofread_report.md
-    └── figures/                    # PRISMA flow, forest plots, etc.
+│   ├── raw_data/                   # original_research only — user places data here
+│   └── revision_history.md
+├── 07_manuscript/
+│   ├── manuscript.md
+│   ├── references.bib
+│   ├── proofread_report.md
+│   ├── revision_history.md
+│   ├── revision_log.md             # Quality metrics per iteration (auto-generated)
+│   ├── journal_compliance.md       # Pre-validated journal formatting requirements
+│   └── figures/                    # PRISMA flow, forest plots, etc.
+└── 00_journal_guidelines/          # Fetched at project setup if target_journal provided
+    └── guidelines_summary.md       # Parsed journal requirements (word limits, sections, format)
 ```
 
 ### Directory and file notes
@@ -75,6 +87,11 @@ Every project lives in its own directory under the pipeline workspace. The direc
 | `07_manuscript/references.bib` | Stage 7 skill | BibTeX reference list compiled from cited studies. |
 | `07_manuscript/proofread_report.md` | Stage 7 skill | Proofreader quality report (grammar, formatting, AI-artifact detection). |
 | `07_manuscript/figures/` | Stage 7 skill | PRISMA flow diagram, forest plots, and other generated figures. |
+| `07_manuscript/revision_log.md` | Stage 7 skill | Quality score metrics per manuscript revision iteration. |
+| `07_manuscript/journal_compliance.md` | Stage 7 skill | Pre-validation report of journal formatting requirements vs. manuscript structure. |
+| `00_journal_guidelines/guidelines_summary.md` | Orchestrator | Parsed journal author guidelines (word limits, required sections, reference style, abstract format). Fetched at project setup. |
+| `*/revision_history.md` | Review protocol | Appended after each review iteration per stage. Logs reviewer findings, agent revisions, cross-stage checks, and escalations. See `references/reviewer-protocol.md` § Revision History Archival. |
+| `02_research_question/novelty_check.md` | Stage 2 skill | Autonomous WebSearch novelty check results — existing reviews found, overlap assessment, verdict. |
 
 ### Directories marked MANUAL
 

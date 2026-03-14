@@ -2,16 +2,20 @@
 
 _For `case_report` projects only. Uses CARE 2013 reporting guideline (13 core items). No PRISMA flow, no statistical pooling._
 
-### C1: Fetch Journal Guidelines
+### C1: Load or Fetch Journal Guidelines
 
-Use WebFetch to retrieve guidelines from `journal_guidelines_url` in `project.yaml`. Extract:
+First, check if `00_journal_guidelines/guidelines_summary.md` exists (pre-fetched at project setup). If yes, read it and use it — do NOT re-fetch. If no, use WebFetch to retrieve guidelines from `journal_guidelines_url` in `project.yaml` and write the summary to `00_journal_guidelines/guidelines_summary.md`. Extract:
 - Word limits (abstract and full text)
 - Required sections and order (some journals use patient-centered section headings)
 - Reference style
 - Patient consent statement requirements (some journals require a specific form)
 - Figure/table limits
 
-If `journal_guidelines_url` is blank: print "Journal guidelines URL not set — using CARE 2013 defaults. Please paste specific journal guidelines if available." and proceed with standard CARE structure.
+If `journal_guidelines_url` is blank and no pre-fetched guidelines exist: print "Journal guidelines URL not set — using CARE 2013 defaults. Please paste specific journal guidelines if available." and proceed with standard CARE structure.
+
+### C1a: Journal Compliance Pre-Validation
+
+Run the same pre-validation as described in `section-b-quantitative.md` Step 1a. Write results to `07_manuscript/journal_compliance.md`. Pass Writer Instructions to all agents in Step C2.
 
 ### C2: Dispatch Manuscript Writer A (Introduction + Case Narrative)
 

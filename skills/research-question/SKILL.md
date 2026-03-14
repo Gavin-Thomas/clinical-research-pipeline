@@ -106,12 +106,57 @@ Present it in full PICO/PEO format with:
 Before finalizing, verify each item and correct inline if any fail:
 1. PICO/PEO completeness: Every component explicitly defined — no vague terms (e.g., "patients" must specify age/condition/setting; "outcomes" must name specific measures with timepoints)
 2. Gap alignment: The selected question directly addresses a named gap from the landscape report — cite the gap by section heading or title; do not state "addresses a gap" without the specific citation
-3. Novelty check: Perform a web search for this exact question published as a systematic review or meta-analysis in the last 3 years. If a near-identical review exists and is not a gap you are explicitly extending, revise scope or framing before presenting
-4. Feasibility consistency: The feasibility justification is calibrated to the evidence base described in the landscape report — do not claim "abundant evidence" if the landscape report found fewer than 15 relevant studies
-5. Project type fit: The PICO/PEO/PCC framework matches the `project_type` in project.yaml (e.g., do not use PEO for an intervention question; do not propose an RCT-focused question for a scoping review)
+3. Feasibility consistency: The feasibility justification is calibrated to the evidence base described in the landscape report — do not claim "abundant evidence" if the landscape report found fewer than 15 relevant studies
+4. Project type fit: The PICO/PEO/PCC framework matches the `project_type` in project.yaml (e.g., do not use PEO for an intervention question; do not propose an RCT-focused question for a scoping review)
 
 Correct any failures inline. Do not present the question to the user until all self-check items pass.
 ```
+
+### Step 3a: Autonomous Novelty Check
+
+After the PI selects the final question but before presenting to the user, perform an autonomous novelty check using WebSearch. This step is NOT delegated to the user — the agent performs it directly.
+
+**Procedure:**
+
+1. **Construct search queries.** From the PI's selected question, build 2–3 search queries:
+   - Query 1: The full research question as a quoted phrase + "systematic review" OR "meta-analysis"
+   - Query 2: Key PICO terms (population + intervention/exposure + outcome) + "systematic review" + last 3 years
+   - Query 3: Key PICO terms + the specific journal or field + "review"
+
+2. **Execute searches.** Use WebSearch for each query. Collect the top 5 results per query.
+
+3. **Evaluate overlap.** For each result that appears to be a published systematic review or meta-analysis:
+   - Compare its PICO/scope to the proposed question
+   - Rate overlap: **Identical** (same PICO, same scope) / **Substantial** (same population + intervention, different outcome or timeframe) / **Partial** (shares 1-2 PICO components) / **None**
+
+4. **Act on findings:**
+
+   | Overlap Level | Action |
+   |---|---|
+   | **Identical** found (published in last 3 years) | **REVISE REQUIRED** — re-dispatch PI to narrow scope, change outcome, extend timeframe, or target a different sub-population. The PI must explain how the revised question differs from the existing review. |
+   | **Substantial** found | **FLAG** — note the existing review in the output. PI must state how this question extends, updates, or differs from the existing review. Proceed if justified. |
+   | **Partial** or **None** | **PASS** — no near-duplicate found. Proceed. |
+
+5. **Write novelty check results** to `02_research_question/novelty_check.md`:
+
+   ```markdown
+   # Novelty Check Results
+
+   ## Search Queries Used
+   1. [query 1]
+   2. [query 2]
+   3. [query 3]
+
+   ## Existing Reviews Found
+   | # | Title | Authors | Year | Journal | Overlap | PICO Comparison |
+   |---|---|---|---|---|---|---|
+   | 1 | [title] | [authors] | [year] | [journal] | Substantial | Same population, different outcome |
+
+   ## Verdict: [PASS / FLAG / REVISE REQUIRED]
+   [Justification — how the proposed question differs from existing reviews, or why revision is needed]
+   ```
+
+If the verdict is REVISE REQUIRED, loop back to Step 3 — re-dispatch the PI with the novelty check results and instruction to revise. Do not proceed to Step 3.5 until the novelty check passes or is flagged-with-justification.
 
 ### Step 3.5: Present to User for Confirmation
 

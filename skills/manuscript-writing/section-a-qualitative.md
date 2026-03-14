@@ -2,9 +2,13 @@
 
 _For `qualitative_synthesis` projects only. Uses ENTREQ reporting standard. No statistical pooling or forest plots._
 
-### A1: Fetch Journal Guidelines
+### A1: Load or Fetch Journal Guidelines
 
-Same as Step 1 below — fetch guidelines from `journal_guidelines_url`. Note word limits, abstract format, and any qualitative-specific requirements (reflexivity statement, COREQ/ENTREQ compliance).
+First, check if `00_journal_guidelines/guidelines_summary.md` exists (pre-fetched at project setup). If yes, read it and use it — do NOT re-fetch. If no, fetch guidelines from `journal_guidelines_url` via WebFetch and write the summary to `00_journal_guidelines/guidelines_summary.md`. Note word limits, abstract format, and any qualitative-specific requirements (reflexivity statement, COREQ/ENTREQ compliance).
+
+### A1a: Journal Compliance Pre-Validation
+
+Run the same pre-validation as described in `section-b-quantitative.md` Step 1a. Write results to `07_manuscript/journal_compliance.md`. Pass Writer Instructions to all agents in Step A2.
 
 ### A2: Dispatch Qualitative Writers in Parallel
 

@@ -2,9 +2,9 @@
 
 _For `original_research` projects only. Uses STROBE (observational cohort/cross-sectional/case-control) or CONSORT (RCT) reporting standard. No PRISMA flow, no search strategy, no systematic screening step. Source data is the primary collected dataset, not extracted literature._
 
-### E1: Fetch Journal Guidelines and Determine Reporting Standard
+### E1: Load or Fetch Journal Guidelines and Determine Reporting Standard
 
-Use WebFetch to retrieve guidelines from `journal_guidelines_url` in `project.yaml`. Extract:
+First, check if `00_journal_guidelines/guidelines_summary.md` exists (pre-fetched at project setup). If yes, read it and use it — do NOT re-fetch. If no, use WebFetch to retrieve guidelines from `journal_guidelines_url` in `project.yaml` and write the summary to `00_journal_guidelines/guidelines_summary.md`. Extract:
 - Word limits (abstract and main text)
 - Required sections and order
 - Reference style
@@ -13,7 +13,11 @@ Use WebFetch to retrieve guidelines from `journal_guidelines_url` in `project.ya
 - Supplementary materials policy (e.g., is the full statistical analysis plan accepted as a supplement?)
 - CONSORT or STROBE checklist submission requirement
 
-If `journal_guidelines_url` is blank: print "Journal guidelines URL not set — using IMRAD defaults. Please paste journal-specific requirements if available." and proceed.
+If `journal_guidelines_url` is blank and no pre-fetched guidelines exist: print "Journal guidelines URL not set — using IMRAD defaults. Please paste journal-specific requirements if available." and proceed.
+
+### E1a: Journal Compliance Pre-Validation
+
+Run the same pre-validation as described in `section-b-quantitative.md` Step 1a. Write results to `07_manuscript/journal_compliance.md`. Pass Writer Instructions to all agents in Step E2.
 
 **Determine reporting standard from `project.yaml`:**
 - `review_config.reporting_standard: CONSORT` → RCT; use CONSORT 2010 (25-item checklist)

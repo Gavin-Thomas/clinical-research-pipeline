@@ -2,16 +2,20 @@
 
 _For `diagnostic_test_accuracy` projects only. Uses STARD 2015 reporting standard (30-item checklist). Reports pooled sensitivity/specificity from a bivariate random-effects model or HSROC curve. No relative risk or treatment-effect language._
 
-### D1: Fetch Journal Guidelines
+### D1: Load or Fetch Journal Guidelines
 
-Use WebFetch to retrieve guidelines from `journal_guidelines_url` in `project.yaml`. Extract:
+First, check if `00_journal_guidelines/guidelines_summary.md` exists (pre-fetched at project setup). If yes, read it and use it — do NOT re-fetch. If no, use WebFetch to retrieve guidelines from `journal_guidelines_url` in `project.yaml` and write the summary to `00_journal_guidelines/guidelines_summary.md`. Extract:
 - Word limits (abstract and main text)
 - Required sections and order
 - Reference formatting style
 - Figure limits and format requirements (DTA manuscripts typically require ≥4 key figures: QUADAS-2 traffic light plot, sensitivity forest plot, specificity forest plot, SROC curve)
 - Whether a completed STARD 2015 checklist is required as a supplementary file
 
-If `journal_guidelines_url` is blank: print "Journal guidelines URL not set — using STARD 2015 defaults." and proceed.
+If `journal_guidelines_url` is blank and no pre-fetched guidelines exist: print "Journal guidelines URL not set — using STARD 2015 defaults." and proceed.
+
+### D1a: Journal Compliance Pre-Validation
+
+Run the same pre-validation as described in `section-b-quantitative.md` Step 1a. Write results to `07_manuscript/journal_compliance.md`. Pass Writer Instructions to all agents in Step D2.
 
 ### D2: Dispatch Writers + Statistician in Parallel
 
